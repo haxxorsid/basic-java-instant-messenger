@@ -5,7 +5,7 @@ A basic java application based on GUI and Sockets+Streams, made as a University 
 ###How to run IM:
 ---------
 
-1. Download repo
+1. Clone or download repo.
 2. First, run ServerTest.java from IMServer project.
 3. Then, run ClientTest.java from IMClient project.
 4. Send and receive messages from Server to Client or vice versa.
