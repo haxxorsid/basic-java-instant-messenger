@@ -1,3 +1,5 @@
+package bjim.client;
+
 import javax.swing.JFrame;
 
 public class ClientTest {

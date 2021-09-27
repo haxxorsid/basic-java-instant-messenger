@@ -1,3 +1,5 @@
+package bjim.server;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +24,7 @@ public class Server extends JFrame {
 	private ObjectInputStream input;
 	private ServerSocket server;
 	private Socket connection;
+	private final int port = 6789;
 
 	public Server() {
 		super("Instant Messenger");
@@ -38,12 +41,12 @@ public class Server extends JFrame {
 		add(new JScrollPane(chatBox));
 		setSize(300, 180);
 		setVisible(true);
-
 	}
 
 	public void startRunning() {
 		try {
-			server = new ServerSocket(6789, 100);
+
+			server = new ServerSocket(port, 100);
 			while (true) {
 				try {
 					waitForConnection();
