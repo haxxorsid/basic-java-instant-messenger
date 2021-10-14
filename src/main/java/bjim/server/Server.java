@@ -1,6 +1,7 @@
 package bjim.server;
 
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.EOFException;
@@ -9,12 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server extends JFrame {
 
@@ -26,11 +23,14 @@ public class Server extends JFrame {
 	private Socket connection;
 	private final int port = 6789;
 
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
 	public Server() {
 		super("Instant Messenger");
 		userMessage = new JTextField();
 		userMessage.setEditable(false);
 		userMessage.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent event) {
 				sendMessage(event.getActionCommand());
 				userMessage.setText("");
@@ -44,31 +44,37 @@ public class Server extends JFrame {
 	}
 
 	public void startRunning() {
-		try {
 
-			server = new ServerSocket(port, 100);
-			while (true) {
+		executorService.submit(new Runnable() {
+
+			@Override
+			public void run() {
 				try {
-					waitForConnection();
-					setupStreams();
-					whileChatting();
-				} catch (EOFException eofException) {
-					showMessage("\n Server ended the connection!");
-				} finally {
-					closeCrap();
+					server = new ServerSocket(port, 100);
+					while (true) {
+						try {
+							waitForConnection();
+							setupStreams();
+							whileChatting();
+						} catch (EOFException eofException) {
+							showMessage("\n Server ended the connection!");
+						} finally {
+							closeCrap();
+						}
+					}
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
 				}
-			}
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
 
-		}
+			}
+		});
 	}
 
 	public void waitForConnection() throws IOException {
 		showMessage("Waiting for someone to connect!");
 		connection = server.accept();
-		showMessage("\nNow connected to"
-				+ connection.getInetAddress().getHostName() + " !");
+		showMessage("\nNow connected to" + connection.getInetAddress()
+				.getHostName() + " !");
 
 	}
 
@@ -119,6 +125,7 @@ public class Server extends JFrame {
 
 	public void showMessage(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+
 			public void run() {
 				chatBox.append(text);
 			}
@@ -127,6 +134,7 @@ public class Server extends JFrame {
 
 	public void ableToType(final boolean tof) {
 		SwingUtilities.invokeLater(new Runnable() {
+
 			public void run() {
 				userMessage.setEditable(tof);
 			}
