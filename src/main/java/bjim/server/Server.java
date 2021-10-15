@@ -169,4 +169,11 @@ public class Server extends JFrame {
 	public int getPort() {
 		return server.getLocalPort();
 	}
+
+	public boolean isRunning() {
+		if (server == null) {
+			return false;
+		}
+		return !server.isClosed();
+	}
 }

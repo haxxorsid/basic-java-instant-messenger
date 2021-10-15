@@ -22,8 +22,8 @@ public class ServerTest {
 		server.startRunning();
 
 		// then
-		Thread.sleep(5000);
-		assertTrue(server.isActive());
+		Thread.sleep(1000);
+		assertTrue(server.isRunning());
 
 		// after
 		server.stopServer();
