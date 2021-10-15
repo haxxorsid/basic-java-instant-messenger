@@ -15,18 +15,26 @@ import java.util.concurrent.Executors;
 
 public class Server extends JFrame {
 
+	public static final int DEFAULT_PORT = 6789;
+
 	private JTextField userMessage;
 	private JTextArea chatBox;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private ServerSocket server;
 	private Socket connection;
-	private final int port = 6789;
+
+	private final int port;
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	public Server() {
+		this(DEFAULT_PORT);
+	}
+
+	public Server(int port) {
 		super("Instant Messenger");
+		this.port = port;
 		userMessage = new JTextField();
 		userMessage.setEditable(false);
 		userMessage.addActionListener(new ActionListener() {
@@ -114,13 +122,30 @@ public class Server extends JFrame {
 		showMessage("\n Closing connections \n");
 		ableToType(false);
 		try {
-			output.close();
-			input.close();
-			connection.close();
+			if (output != null) {
+				output.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
 
+	public void stopServer() {
+		System.out.println("Stopping server...");
+		while (!server.isClosed()) {
+			try {
+				server.close();
+				return;
+			} catch (IOException e) {
+				System.out.println("Failed to stop server...");
+			}
+		}
 	}
 
 	public void showMessage(final String text) {
@@ -139,5 +164,9 @@ public class Server extends JFrame {
 				userMessage.setEditable(tof);
 			}
 		});
+	}
+
+	public int getPort() {
+		return server.getLocalPort();
 	}
 }
