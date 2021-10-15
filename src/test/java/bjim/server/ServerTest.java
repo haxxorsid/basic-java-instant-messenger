@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static bjim.server.Server.DEFAULT_PORT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,22 @@ public class ServerTest {
 
 		// after
 		server.stopServer();
+	}
+
+	@Test
+	public void stopServer() throws InterruptedException {
+
+		// given
+		Server server = new Server();
+		server.startRunning();
+		Thread.sleep(1000);
+
+		// when
+		server.stopServer();
+
+		// then
+		Thread.sleep(1000);
+		assertFalse(server.isRunning());
 	}
 
 	@Test
