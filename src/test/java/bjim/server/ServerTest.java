@@ -80,7 +80,7 @@ public class ServerTest {
 		Thread.sleep(1000);
 		Assert.assertEquals(CUSTOM_PORT, server.getPort());
 
-		// after
+		// after code
 		server.stopServer();
 	}
 }
