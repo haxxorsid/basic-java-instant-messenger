@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -16,15 +17,19 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+
 public class Client extends JFrame {
-	private JTextField userMessage;
+	public JTextField userMessage;
 	private JTextArea chatBox;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private String message = "";
 	private String serverIP;
 	private Socket connection;
-
+	public boolean type;
+	public int w;
+	int checkstatus=0;
+	public  boolean tow;
 	public Client(String host) {
 		super("Client!");
 		serverIP = host;
@@ -51,19 +56,20 @@ public class Client extends JFrame {
 			connectToServer();
 			setupStreams();
 			whileChatting();
+
 		} catch (EOFException eofException) {
 			showMessage("\n Client terminated the connection");
+			closeCrap();
 
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
-		} finally {
-			closeCrap();
 		}
 	}
 
-	private void connectToServer() throws IOException {
+	public void connectToServer() throws IOException {
 		showMessage("Attempting connection");
 		connection = new Socket(InetAddress.getByName(serverIP), 6789);
+		System.out.println(connection);
 		showMessage("\nConnected to" + connection.getInetAddress().getHostName());
 
 	}
@@ -78,6 +84,7 @@ public class Client extends JFrame {
 
 	private void whileChatting() throws IOException {
 		ableToType(true);
+
 		do {
 			try {
 				message = (String) input.readObject();
@@ -89,19 +96,21 @@ public class Client extends JFrame {
 		} while (!message.equals("\nADMIN - END"));
 	}
 
-	private void closeCrap() {
+	public void closeCrap() {
 		showMessage("\nClosing down!");
 		ableToType(false);
+
 		try {
 			output.close();
 			input.close();
 			connection.close();
+
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
 	}
-	
-	private void sendMessage(String message){
+
+	public void sendMessage(String message){
 		try{
 			output.writeObject("USER - "+ message);
 			output.flush();
@@ -109,21 +118,88 @@ public class Client extends JFrame {
 		}catch(IOException ioException){
 			chatBox.append("\nSomething is messed up!");
 		}
-		
+
 	}
-	
-	private void showMessage(final String m){
+	public void checkconnection() throws IOException {
+		try{if (connection.isClosed() ) {
+			checkstatus=0;
+		}
+		else  checkstatus=1;}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	public int running()
+	{
+		if (checkstatus==1)
+			return 1;
+		else return 0;
+	}
+
+	public void showMessage(final String m){
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
 				chatBox.append(m);
 			}
 		});
 	}
-	private void ableToType(final boolean tof){
+	public void ableToType(final boolean tof){
+		editable (tof);
 		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
+
+
+			public void run()
+			{
 				userMessage.setEditable(tof);
+				if(userMessage.isEditable())
+				{System.out.println("it is true");
+					checkstatus=1;}
+
 			}
 		});
 	}
+
+
+	public boolean chek( )
+	{if(userMessage.isEnabled()==true)
+		return true;
+	else return false;}
+
+
+
+	public boolean checktypestatus() throws IOException {
+		showMessage("Attempting connection");
+		connection = new Socket(InetAddress.getByName(serverIP), 6789);
+		System.out.println(connection);
+		showMessage("\nConnected to" + connection.getInetAddress().getHostName());
+		output = new ObjectOutputStream(connection.getOutputStream());
+		output.flush();
+		input = new ObjectInputStream(connection.getInputStream());
+		showMessage("\nStreams are now good to go!");
+		ableToType(true);
+
+
+		if(userMessage.isEnabled()==true)
+			return true;
+		else return false;
+	}
+
+
+	public void editable(boolean s)
+	{tow=s;
+
+	}
+	public boolean get()
+	{return tow;}
+
+
+
+
+
+	public String gettext()
+	{
+		return chatBox.getText();
+	}
+
 }
