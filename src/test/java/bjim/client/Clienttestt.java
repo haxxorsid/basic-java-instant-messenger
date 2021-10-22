@@ -39,32 +39,7 @@ assertEquals(0,client.running());
 
 
 
-    @Test
-    public void server_cannot_type_if_server_starts_after_clientchatbox_starts() throws InterruptedException {
-
-        // given
-
-        Server server = new Server();
-        Client client = new Client("127.0.0.1");
-        client.startRunning();
-        Thread.sleep(6000);
-        // when
-        server.startRunning();
-
-
-        Thread.sleep(6000);
-        assertFalse(server.chek());
-
-
-
-        // then
-
-
-
-
-
-    }
-
+    
 
 
     @Test
