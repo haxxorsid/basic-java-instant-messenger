@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
 
 public class Client {
 
+	public static final String LOCAL_HOST = "127.0.0.1";
+
 	// client input/output channels
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
@@ -37,6 +39,9 @@ public class Client {
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+	public Client(){
+		this(LOCAL_HOST);
+	}
 	public Client(String host) {
 		serverIP = host;
 		userMessage = new JTextField();
@@ -174,5 +179,9 @@ public class Client {
 
 	public void setDefaultCloseOperation(int exitOnClose) {
 		chatWindow.setDefaultCloseOperation(exitOnClose);
+	}
+
+	public String getServerIP() {
+		return serverIP;
 	}
 }

@@ -1,12 +1,44 @@
 package bjim.client;
 
-import javax.swing.JFrame;
+import bjim.server.Server;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static bjim.client.Client.LOCAL_HOST;
 
 public class ClientTest {
-	public static void main(String[] args) {
-		Client user;
-		user = new Client("127.0.0.1");
-		user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		user.startRunning();
+
+	@Test
+	public void isClientConnected() throws InterruptedException {
+
+		// given
+		Server server = new Server();
+		Client client = new Client();
+		server.startRunning();
+		Thread.sleep(1000);
+		client.startRunning();
+		Thread.sleep(1000);
+
+		// when
+		boolean clientConnected = server.isClientConnected();
+
+		// then
+		Assert.assertTrue(clientConnected);
+
+		// after
+		server.stopServer();
+		client.stopClient();
+	}
+
+	@Test
+	public void serverIPIsLocalHostByDefault() {
+
+		// given
+		Client client = new Client();
+
+		// whe
+		String serverIP = client.getServerIP();
+
+		Assert.assertEquals(LOCAL_HOST, serverIP);
 	}
 }
