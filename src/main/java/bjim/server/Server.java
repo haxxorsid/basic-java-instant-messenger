@@ -120,18 +120,27 @@ public class Server  {
 		showMessage("\nStreams are setup! \n");
 	}
 
+
+	public String servermsg="";
 	public void whileChatting() throws IOException {
 		String message = "\nYou are now connected!";
 		sendMessage(message);
 		ableToType(true);
 		do {
 			try {
+
 				message = (String) input.readObject();
 				showMessage("\n" + message);
+				servermsg=message;
 			} catch (ClassNotFoundException classNotFoundException) {
 				showMessage("\n I don't know what user send!");
 			}
 		} while (!message.equals("\nUSER-END"));
+	}
+
+	public String servermessagereturn()
+	{
+		return servermsg;
 	}
 
 	public void sendMessage(String message) {
@@ -195,11 +204,19 @@ public class Server  {
 		});
 	}
 
+
+	public  String messagefromserver()
+	{
+		return chatBox.getText();
+	}
+
 	public void ableToType(final boolean tof) {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
 				userMessage.setEditable(tof);
+
+				//servermsg=userMessage.getText();
 			}
 		});
 	}

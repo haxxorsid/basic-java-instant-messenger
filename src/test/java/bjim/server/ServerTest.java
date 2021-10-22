@@ -97,14 +97,36 @@ public class ServerTest {
 		// when
 		server.startRunning();
 		Thread.sleep(6000);
+
+		//then
 		Assert.assertEquals(false, server.connected());
+
+		//after
 		server.stopServer();
 
 	}
 
 
 
+	@Test
+	public void messagearecorrect() throws InterruptedException {
+		// given
 
+		Server server = new Server();
+		Client cl = new Client("127.0.0.1");
+		//
+		// when
+		server.startRunning();
+		Thread.sleep(6000);
+
+		cl.startRunning();
+		Thread.sleep(6000);
+
+
+
+		Assert.assertEquals("hi", server.servermessagereturn());
+		server.stopServer();
+	}
 
 
 
