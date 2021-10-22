@@ -164,8 +164,7 @@ public class Server  {
 		return userMessage.getText();
 	}
 
-
-	public void closeCrap() {
+	private void closeCrap() {
 		showMessage("\n Closing connections \n");
 		ableToType(false);
 		try {

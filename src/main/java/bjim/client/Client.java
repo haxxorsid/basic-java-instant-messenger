@@ -33,6 +33,7 @@ public class Client {
 	private JFrame chatWindow;
 	private JTextField userMessage;
 	private JTextArea chatBox;
+	private String lastReceivedMessage = "";
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -79,6 +80,10 @@ public class Client {
 		});
 	}
 
+	public String getLastReceivedMessage() {
+		return lastReceivedMessage;
+	}
+
 	private void connectToServer() throws IOException {
 		showMessage("Attempting connection");
 		clientSocket = new Socket(InetAddress.getByName(serverIP), 6789);
@@ -97,27 +102,44 @@ public class Client {
 
 	private void whileChatting() throws IOException {
 		ableToType(true);
-		String message = "";
 		do {
 			try {
-				message = String.valueOf(input.readObject());
-				showMessage("\n" + message);
+				lastReceivedMessage = String.valueOf(input.readObject());
+				showMessage("\n" + lastReceivedMessage);
 
 			} catch (ClassNotFoundException classNotFoundException) {
 				showMessage("\nDont know ObjectType!");
 			}
-		} while (!message.equals("\nADMIN - END"));
+		} while (!lastReceivedMessage.equals("\nADMIN - END"));
 	}
 
 	private void closeCrap() {
 		showMessage("\nClosing down!");
 		ableToType(false);
 		try {
-			output.close();
-			input.close();
-			clientSocket.close();
+			if (output != null) {
+				output.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			if (clientSocket != null) {
+				clientSocket.close();
+			}
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
+		}
+	}
+
+	public void stopClient() {
+		System.out.println("Stopping client...");
+		while (!clientSocket.isClosed()) {
+			try {
+				clientSocket.close();
+				return;
+			} catch (IOException e) {
+				System.out.println("Failed to stop client...");
+			}
 		}
 	}
 

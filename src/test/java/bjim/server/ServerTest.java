@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static bjim.server.Server.DEFAULT_PORT;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -79,7 +80,7 @@ public class ServerTest {
 
 		// then
 		Thread.sleep(1000);
-		Assert.assertEquals(CUSTOM_PORT, server.getPort());
+		assertEquals(CUSTOM_PORT, server.getPort());
 
 		// after code
 		server.stopServer();
@@ -94,40 +95,38 @@ public class ServerTest {
 
 		Server server = new Server();
 		//Client cl = new Client("127.0.0.1");
+
 		// when
 		server.startRunning();
-		Thread.sleep(6000);
+		Thread.sleep(1000);
 
 		//then
-		Assert.assertEquals(false, server.connected());
+		assertFalse(server.connected());
 
 		//after
 		server.stopServer();
 
 	}
 
-
-
 	@Test
-	public void messagearecorrect() throws InterruptedException {
+	public void serverSendsAMessageAndClientReceivesIt() throws InterruptedException {
+
 		// given
-
 		Server server = new Server();
-		Client cl = new Client("127.0.0.1");
-		//
-		// when
+		Client client = new Client("127.0.0.1");
 		server.startRunning();
-		Thread.sleep(6000);
+		Thread.sleep(1000);
+		client.startRunning();
+		Thread.sleep(1000);
 
-		cl.startRunning();
-		Thread.sleep(6000);
+		server.sendMessage("hi");
+		Thread.sleep(500);
+
+		// then
+		assertEquals("ADMIN- hi", client.getLastReceivedMessage());
 
 
-
-		Assert.assertEquals("hi", server.servermessagereturn());
 		server.stopServer();
+		client.stopClient();
 	}
-
-
-
 }
