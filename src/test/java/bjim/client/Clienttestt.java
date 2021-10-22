@@ -17,7 +17,7 @@ public class Clienttestt {
     private CountDownLatch controlLatch;
 
     @Test
-    public void without_serverstart_client_cannot_connect() throws InterruptedException, IOException {
+    public void ClientAppDoNotGetConnectionIfServerAppDonotStarts() throws InterruptedException, IOException {
 
         // given
         Client client = new Client("127.0.0.1");
@@ -29,22 +29,21 @@ public class Clienttestt {
 
         client.startRunning();
         Thread.sleep(5000);
-client.checkconnection();
-assertEquals(0,client.running());
+       client.checkconnection();
+
         // then
 
-
+        assertEquals(0,client.running());
 
     }
 
 
 
-    
+
 
 
     @Test
-    public void client_can_type_if_server_starts_firststarts() throws InterruptedException, IOException {
-
+    public void CLientCanBeAbleToTypeIfClientGetConnectionToServer() throws InterruptedException, IOException {
         // given
         controlLatch = new CountDownLatch(2);
 
@@ -54,13 +53,7 @@ assertEquals(0,client.running());
         // when
         server.startRunning();
         controlLatch.await(4, TimeUnit.SECONDS);
-
-
-
-
-
-
-
+//then
 
     assertTrue(client.checktypestatus());
 

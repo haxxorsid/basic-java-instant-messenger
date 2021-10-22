@@ -190,7 +190,7 @@ public class Server  {
 	}
 
 
-	public boolean chek()
+	public boolean abletowrite()
 	{if(userMessage.isEditable()==true)
 		return true;
 	else return false;}

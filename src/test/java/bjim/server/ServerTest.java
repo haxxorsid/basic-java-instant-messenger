@@ -41,17 +41,20 @@ assertTrue(server.serversocketcondition());
 
 	@Test
 	public void server_send_wlcome_message() throws InterruptedException
-	{
+	{    //given
 		Server server = new Server();
 		server.startRunning();
-
+         //then
 		Thread.sleep(5000);
 		assertEquals("Waiting for someone to connect!", server.gettext());
+		//after
+		server.stopServer();
 
 	}
 
 	@Test
-	public void server_cannot_type_whenclient_disconnected() throws InterruptedException {
+	public void ServerCannotWriteIfClientIsNotConnected() throws InterruptedException
+	{
 
 		// given
 
@@ -61,13 +64,14 @@ assertTrue(server.serversocketcondition());
 		// when
 		server.startRunning();
 
-
+     //then
 		Thread.sleep(6000);
-		assertFalse(server.chek());
+		assertFalse(server.abletowrite());
 
 
 
-		// then
+		// after
+		server.stopServer();
 
 
 
@@ -75,7 +79,7 @@ assertTrue(server.serversocketcondition());
 
 	}
 	@Test
-	public void server_cannot_type_if_server_starts_after_clientchatbox_starts() throws InterruptedException {
+	public void ServerCannotWriteIfServerappStartsAfterClientappStarts() throws InterruptedException {
 
 		// given
 
@@ -88,7 +92,7 @@ assertTrue(server.serversocketcondition());
 
 
 		Thread.sleep(6000);
-		assertFalse(server.chek());
+		assertFalse(server.abletowrite());
 
 
 
