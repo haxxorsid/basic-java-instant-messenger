@@ -207,7 +207,12 @@ public class Server  {
 	}
 
 
-
+public boolean serversocketcondition()
+{
+	if(serverSocket.isBound())
+		return true;
+	else return false;
+}
 
 
 

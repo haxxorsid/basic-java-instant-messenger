@@ -59,7 +59,7 @@ public class Client extends JFrame {
 
 		} catch (EOFException eofException) {
 			showMessage("\n Client terminated the connection");
-			closeCrap();
+
 
 		} catch (IOException ioException) {
 			ioException.printStackTrace();

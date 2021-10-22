@@ -86,7 +86,26 @@ public class ServerTest {
 		// after
 		server.stopServer();
 	}
+	@Test
+	public void server_accept_client_request_to_coonect() throws InterruptedException, IOException {
 
+		// given
+		Server server = new Server();
+		Client client = new Client("127.0.0.1");
+
+		// before
+		server.startRunning();
+
+		Thread.sleep(3000);
+		client.connectToServer();
+		Thread.sleep(3000);
+
+		// then
+
+assertTrue(server.serversocketcondition());
+		// after
+		server.stopServer();
+	}
 
 	@Test
 	public void server_send_wlcome_message() throws InterruptedException
@@ -105,6 +124,7 @@ public class ServerTest {
 		// given
 
 		Server server = new Server();
+		Client client = new Client("127.0.0.1");
 
 		// when
 		server.startRunning();
