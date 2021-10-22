@@ -1,7 +1,7 @@
 package bjim.client;
 
 import javax.swing.JFrame;
-
+//hello
 public class ClientTest {
 	public static void main(String[] args) {
 		Client user;
