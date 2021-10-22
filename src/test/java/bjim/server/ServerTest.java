@@ -89,7 +89,7 @@ public class ServerTest {
 
 
 	@Test
-	public void checkConnectiontrue() throws InterruptedException {
+	public void checkConnectiontrueforServer() throws InterruptedException {
 
 		// given
 
