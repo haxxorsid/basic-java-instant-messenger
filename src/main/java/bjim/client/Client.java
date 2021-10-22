@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -16,71 +18,89 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-public class Client extends JFrame {
-	private JTextField userMessage;
-	private JTextArea chatBox;
+public class Client {
+
+	// client input/output channels
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
-	private String message = "";
+
 	private String serverIP;
-	private Socket connection;
+
+	// the socket where the client is connected
+	private Socket clientSocket;
+
+	// Chat attributes
+	private JFrame chatWindow;
+	private JTextField userMessage;
+	private JTextArea chatBox;
+
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	public Client(String host) {
-		super("Client!");
 		serverIP = host;
 		userMessage = new JTextField();
 		userMessage.setEditable(false);
 		userMessage.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent event) {
 				sendMessage(event.getActionCommand());
 				userMessage.setText("");
 
 			}
 		});
-		add(userMessage, BorderLayout.NORTH);
-		chatBox = new JTextArea();
-		add(new JScrollPane(chatBox), BorderLayout.CENTER);
-		setSize(300, 180);
-		setVisible(true);
 
+		chatWindow = new JFrame("Client!");
+		chatWindow.add(userMessage, BorderLayout.NORTH);
+		chatBox = new JTextArea();
+		chatWindow.add(new JScrollPane(chatBox), BorderLayout.CENTER);
+		chatWindow.setSize(300, 180);
+		chatWindow.setVisible(true);
 	}
 
 	public void startRunning() {
 
-		try {
-			connectToServer();
-			setupStreams();
-			whileChatting();
-		} catch (EOFException eofException) {
-			showMessage("\n Client terminated the connection");
+		executorService.submit(new Runnable() {
 
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		} finally {
-			closeCrap();
-		}
+			@Override
+			public void run() {
+				try {
+					connectToServer();
+					setupStreams();
+					whileChatting();
+				} catch (EOFException eofException) {
+					showMessage("\n Client terminated the connection");
+
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
+				} finally {
+					closeCrap();
+				}
+			}
+		});
 	}
 
 	private void connectToServer() throws IOException {
 		showMessage("Attempting connection");
-		connection = new Socket(InetAddress.getByName(serverIP), 6789);
-		showMessage("\nConnected to" + connection.getInetAddress().getHostName());
+		clientSocket = new Socket(InetAddress.getByName(serverIP), 6789);
+		showMessage("\nConnected to" + clientSocket.getInetAddress()
+				.getHostName());
 
 	}
 
 	private void setupStreams() throws IOException {
-		output = new ObjectOutputStream(connection.getOutputStream());
+		output = new ObjectOutputStream(clientSocket.getOutputStream());
 		output.flush();
-		input = new ObjectInputStream(connection.getInputStream());
+		input = new ObjectInputStream(clientSocket.getInputStream());
 		showMessage("\nStreams are now good to go!");
 
 	}
 
 	private void whileChatting() throws IOException {
 		ableToType(true);
+		String message = "";
 		do {
 			try {
-				message = (String) input.readObject();
+				message = String.valueOf(input.readObject());
 				showMessage("\n" + message);
 
 			} catch (ClassNotFoundException classNotFoundException) {
@@ -95,35 +115,42 @@ public class Client extends JFrame {
 		try {
 			output.close();
 			input.close();
-			connection.close();
+			clientSocket.close();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
 	}
-	
-	private void sendMessage(String message){
-		try{
-			output.writeObject("USER - "+ message);
+
+	private void sendMessage(String message) {
+		try {
+			output.writeObject("USER - " + message);
 			output.flush();
-			showMessage("\nUSER - "+message);
-		}catch(IOException ioException){
+			showMessage("\nUSER - " + message);
+		} catch (IOException ioException) {
 			chatBox.append("\nSomething is messed up!");
 		}
-		
+
 	}
-	
-	private void showMessage(final String m){
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
+
+	private void showMessage(final String m) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
 				chatBox.append(m);
 			}
 		});
 	}
-	private void ableToType(final boolean tof){
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
+
+	private void ableToType(final boolean tof) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
 				userMessage.setEditable(tof);
 			}
 		});
+	}
+
+	public void setDefaultCloseOperation(int exitOnClose) {
+		chatWindow.setDefaultCloseOperation(exitOnClose);
 	}
 }
