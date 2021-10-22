@@ -37,6 +37,8 @@ public class Client {
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+	public boolean windowvisible=false;
+
 	public Client(String host) {
 		serverIP = host;
 		userMessage = new JTextField();
@@ -56,6 +58,13 @@ public class Client {
 		chatWindow.add(new JScrollPane(chatBox), BorderLayout.CENTER);
 		chatWindow.setSize(300, 180);
 		chatWindow.setVisible(true);
+		windowvisible=chatWindow.isVisible();
+	}
+
+	//check client window is Visible
+	public boolean isWindowvisibleclientSide()
+	{
+		return windowvisible;
 	}
 
 	public void startRunning() {

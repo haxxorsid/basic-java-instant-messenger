@@ -41,6 +41,10 @@ public class Server  {
 	public String msg;
     public boolean connected_sr_cl=false;
 
+	public boolean windowvisible=false;
+
+
+
 	// A single thread for the server accept loop
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -66,6 +70,16 @@ public class Server  {
 		chatWindow.add(new JScrollPane(chatBox));
 		chatWindow.setSize(300, 180);
 		chatWindow.setVisible(true);
+
+		windowvisible=chatWindow.isVisible();
+		//windowvisible=true;
+	}
+
+
+	//check server window is Visible
+	public boolean isWindowvisible()
+	{
+		return windowvisible;
 	}
 
 	public void startRunning() {

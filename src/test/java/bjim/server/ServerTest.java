@@ -129,4 +129,29 @@ public class ServerTest {
 		server.stopServer();
 		client.stopClient();
 	}
+
+	@Test
+	public void clientSendsAMessageAndServerReceivesIt() throws InterruptedException {
+
+	}
+
+	@Test
+	public void windowIsVisibleduringWhenstartTheServer() throws InterruptedException
+	{
+		// given
+		Server server = new Server();
+		server.startRunning();
+		Thread.sleep(1000);
+
+
+		assertEquals(true, server.isWindowvisible());
+
+
+		server.stopServer();
+
+
+	}
+
+
+
 }
