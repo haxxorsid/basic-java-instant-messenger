@@ -35,6 +35,12 @@ public class Server  {
 	private JTextField userMessage;
 	private JTextArea chatBox;
 
+
+	//checking variables
+
+	public String msg;
+    public boolean connected_sr_cl=false;
+
 	// A single thread for the server accept loop
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -92,11 +98,21 @@ public class Server  {
 	public void waitForConnection() throws IOException {
 		showMessage("Waiting for someone to connect!");
 		clientConnection = serverSocket.accept();
+		connected_sr_cl=true;
 		showMessage("\nNow connected to" + clientConnection.getInetAddress()
 				.getHostName() + " !");
 
+
 	}
 
+
+
+	//check server and client are connected
+
+	public boolean connected()
+	{
+		return connected_sr_cl;
+	}
 	public void setupStreams() throws IOException {
 		output = new ObjectOutputStream(clientConnection.getOutputStream());
 		output.flush();
@@ -119,6 +135,7 @@ public class Server  {
 	}
 
 	public void sendMessage(String message) {
+
 		try {
 			output.writeObject("ADMIN- " + message);
 			output.flush();
@@ -128,6 +145,16 @@ public class Server  {
 			chatBox.append("\nERROR: Can't send that message");
 		}
 	}
+
+
+	public String getchatText()
+	{
+		//return chatBox.getText();
+		//return msg;
+
+		return userMessage.getText();
+	}
+
 
 	public void closeCrap() {
 		showMessage("\n Closing connections \n");

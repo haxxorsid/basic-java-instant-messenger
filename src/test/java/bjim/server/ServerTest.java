@@ -1,4 +1,5 @@
 package bjim.server;
+import bjim.client.Client;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -83,4 +84,28 @@ public class ServerTest {
 		// after code
 		server.stopServer();
 	}
+
+
+
+	@Test
+	public void checkConnectiontrue() throws InterruptedException {
+
+		// given
+
+		Server server = new Server();
+		//Client cl = new Client("127.0.0.1");
+		// when
+		server.startRunning();
+		Thread.sleep(6000);
+		Assert.assertEquals(false, server.connected());
+		server.stopServer();
+
+	}
+
+
+
+
+
+
+
 }
