@@ -15,6 +15,8 @@ public class ServerTest {
 
 	private static final int CUSTOM_PORT = 1234;
 
+
+	//Test by Saleh
 	@Test
 	public void startServer() throws InterruptedException {
 
@@ -65,6 +67,8 @@ public class ServerTest {
 		server.stopServer();
 	}
 
+
+
 	@Test
 	public void serverStartsOnCustomPort() throws InterruptedException {
 
@@ -87,7 +91,7 @@ public class ServerTest {
 	}
 
 
-
+//Tests by Jaydeb
 	@Test
 	public void checkConnectiontrueforServer() throws InterruptedException {
 
