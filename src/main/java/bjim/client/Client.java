@@ -152,7 +152,7 @@ public class Client {
 		}
 	}
 
-	private void sendMessage(String message) {
+	public void sendMessage(String message) {
 		try {
 			output.writeObject("USER - " + message);
 			output.flush();

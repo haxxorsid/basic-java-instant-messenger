@@ -42,7 +42,11 @@ public class Server  {
     public boolean connected_sr_cl=false;
 
 	public boolean windowvisible=false;
+    public boolean userMessageVisible=false;
 
+
+	//checking last received message from client to server
+	private String lastReceivedMessagetoServer = "";
 
 
 	// A single thread for the server accept loop
@@ -63,6 +67,7 @@ public class Server  {
 			public void actionPerformed(ActionEvent event) {
 				sendMessage(event.getActionCommand());
 				userMessage.setText("");
+
 			}
 		});
 		chatWindow.add(userMessage, BorderLayout.NORTH);
@@ -72,7 +77,7 @@ public class Server  {
 		chatWindow.setVisible(true);
 
 		windowvisible=chatWindow.isVisible();
-		//windowvisible=true;
+		userMessageVisible=userMessage.isVisible();
 	}
 
 
@@ -81,6 +86,14 @@ public class Server  {
 	{
 		return windowvisible;
 	}
+
+
+	//check user messagefrom server  is Visible
+	public boolean isServerMessageVisible()
+	{
+		return userMessageVisible;
+	}
+
 
 	public void startRunning() {
 
@@ -142,15 +155,24 @@ public class Server  {
 		ableToType(true);
 		do {
 			try {
+				lastReceivedMessagetoServer = String.valueOf(input.readObject());
+				//message = (String) input.readObject();
+				//showMessage("\n" + message);
+				showMessage("\n" + lastReceivedMessagetoServer);
 
-				message = (String) input.readObject();
-				showMessage("\n" + message);
-				servermsg=message;
+
 			} catch (ClassNotFoundException classNotFoundException) {
 				showMessage("\n I don't know what user send!");
 			}
-		} while (!message.equals("\nUSER-END"));
+		} while (!lastReceivedMessagetoServer.equals("\nUSER-END"));
 	}
+
+	//added to show last received message
+	public String getLastReceivedMessage() {
+		return lastReceivedMessagetoServer;
+	}
+
+
 
 	public String servermessagereturn()
 	{

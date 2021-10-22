@@ -119,21 +119,34 @@ public class ServerTest {
 		client.startRunning();
 		Thread.sleep(1000);
 
+		//when
 		server.sendMessage("hi");
 		Thread.sleep(500);
 
 		// then
 		assertEquals("ADMIN- hi", client.getLastReceivedMessage());
-
-
+		//after
 		server.stopServer();
 		client.stopClient();
 	}
 
-	@Test
-	public void clientSendsAMessageAndServerReceivesIt() throws InterruptedException {
 
+
+	@Test
+	public void serverUserMessageVisibleTrue() throws InterruptedException
+	{
+		// given
+		Server server = new Server();
+		server.startRunning();
+		Thread.sleep(1000);
+
+		//then
+		assertEquals(true, server.isServerMessageVisible());
+
+		//after
+		server.stopServer();
 	}
+
 
 	@Test
 	public void windowIsVisibleduringWhenstartTheServer() throws InterruptedException
@@ -143,12 +156,11 @@ public class ServerTest {
 		server.startRunning();
 		Thread.sleep(1000);
 
-
+        //then
 		assertEquals(true, server.isWindowvisible());
 
-
+        //after
 		server.stopServer();
-
 
 	}
 
