@@ -82,7 +82,7 @@ public class Server  {
 						}
 					}
 				} catch (IOException ioException) {
-					ioException.printStackTrace();
+					System.out.println("Stopping server: " + ioException.getMessage());
 				}
 
 			}

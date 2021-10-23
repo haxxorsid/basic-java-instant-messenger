@@ -77,7 +77,7 @@ public class Client {
 					showMessage("\n Client terminated the connection");
 
 				} catch (IOException ioException) {
-					ioException.printStackTrace();
+					System.out.println("Stopping client: " + ioException.getMessage());
 				} finally {
 					closeCrap();
 				}
