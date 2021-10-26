@@ -8,7 +8,7 @@ public class ServerApplication {
 
 	public static void main(String[] args) {
 
-		// run server
+		// run server code
 		Server admin = new Server();
 		admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		admin.startRunning();

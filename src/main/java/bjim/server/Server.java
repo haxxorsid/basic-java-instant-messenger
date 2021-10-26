@@ -35,6 +35,20 @@ public class Server  {
 	private JTextField userMessage;
 	private JTextArea chatBox;
 
+
+	//checking variables
+
+	public String msg;
+    public boolean connected_sr_cl=false;
+
+	public boolean windowvisible=false;
+    public boolean userMessageVisible=false;
+
+
+	//checking last received message from client to server
+	private String lastReceivedMessagetoServer = "";
+
+
 	// A single thread for the server accept loop
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -53,6 +67,7 @@ public class Server  {
 			public void actionPerformed(ActionEvent event) {
 				sendMessage(event.getActionCommand());
 				userMessage.setText("");
+
 			}
 		});
 		chatWindow.add(userMessage, BorderLayout.NORTH);
@@ -60,7 +75,25 @@ public class Server  {
 		chatWindow.add(new JScrollPane(chatBox));
 		chatWindow.setSize(300, 180);
 		chatWindow.setVisible(true);
+
+		windowvisible=chatWindow.isVisible();
+		userMessageVisible=userMessage.isVisible();
 	}
+
+
+	//check server window is Visible
+	public boolean isWindowvisible()
+	{
+		return windowvisible;
+	}
+
+
+	//check user messagefrom server  is Visible
+	public boolean isServerMessageVisible()
+	{
+		return userMessageVisible;
+	}
+
 
 	public void startRunning() {
 
@@ -92,11 +125,21 @@ public class Server  {
 	public void waitForConnection() throws IOException {
 		showMessage("Waiting for someone to connect!");
 		clientConnection = serverSocket.accept();
+		connected_sr_cl=true;
 		showMessage("\nNow connected to" + clientConnection.getInetAddress()
 				.getHostName() + " !");
 
+
 	}
 
+
+
+	//check server and client are connected
+
+	public boolean connected()
+	{
+		return connected_sr_cl;
+	}
 	public void setupStreams() throws IOException {
 		output = new ObjectOutputStream(clientConnection.getOutputStream());
 		output.flush();
@@ -104,21 +147,40 @@ public class Server  {
 		showMessage("\nStreams are setup! \n");
 	}
 
+
+	public String servermsg="";
 	public void whileChatting() throws IOException {
 		String message = "\nYou are now connected!";
 		sendMessage(message);
 		ableToType(true);
 		do {
 			try {
-				message = (String) input.readObject();
-				showMessage("\n" + message);
+				lastReceivedMessagetoServer = String.valueOf(input.readObject());
+				//message = (String) input.readObject();
+				//showMessage("\n" + message);
+				showMessage("\n" + lastReceivedMessagetoServer);
+
+
 			} catch (ClassNotFoundException classNotFoundException) {
 				showMessage("\n I don't know what user send!");
 			}
-		} while (!message.equals("\nUSER-END"));
+		} while (!lastReceivedMessagetoServer.equals("\nUSER-END"));
+	}
+
+	//added to show last received message
+	public String getLastReceivedMessage() {
+		return lastReceivedMessagetoServer;
+	}
+
+
+
+	public String servermessagereturn()
+	{
+		return servermsg;
 	}
 
 	public void sendMessage(String message) {
+
 		try {
 			output.writeObject("ADMIN- " + message);
 			output.flush();
@@ -129,7 +191,16 @@ public class Server  {
 		}
 	}
 
-	public void closeCrap() {
+
+	public String getchatText()
+	{
+		//return chatBox.getText();
+		//return msg;
+
+		return userMessage.getText();
+	}
+
+	private void closeCrap() {
 		showMessage("\n Closing connections \n");
 		ableToType(false);
 		try {
@@ -168,11 +239,19 @@ public class Server  {
 		});
 	}
 
+
+	public  String messagefromserver()
+	{
+		return chatBox.getText();
+	}
+
 	public void ableToType(final boolean tof) {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
 				userMessage.setEditable(tof);
+
+				//servermsg=userMessage.getText();
 			}
 		});
 	}
