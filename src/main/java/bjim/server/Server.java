@@ -13,20 +13,39 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server extends JFrame {
+public class Server  {
 
-	private JTextField userMessage;
-	private JTextArea chatBox;
+	public static final int DEFAULT_PORT = 6789;
+
+	// the port where the server is listening
+	private final int port;
+
+	// the socket where the server is listening
+	private ServerSocket serverSocket;
+
+	// the connection created once a client is accepted by the server
+	private Socket clientConnection;
+
+	// client input/output channels
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
-	private ServerSocket server;
-	private Socket connection;
-	private final int port = 6789;
 
+	// Chat attributes
+	private JFrame chatWindow;
+	private JTextField userMessage;
+	private JTextArea chatBox;
+
+	// A single thread for the server accept loop
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	public Server() {
-		super("Instant Messenger");
+		this(DEFAULT_PORT);
+	}
+
+	public Server(int port) {
+		this.port = port;
+
+		chatWindow = new JFrame("Instant Messenger");
 		userMessage = new JTextField();
 		userMessage.setEditable(false);
 		userMessage.addActionListener(new ActionListener() {
@@ -36,11 +55,11 @@ public class Server extends JFrame {
 				userMessage.setText("");
 			}
 		});
-		add(userMessage, BorderLayout.NORTH);
+		chatWindow.add(userMessage, BorderLayout.NORTH);
 		chatBox = new JTextArea();
-		add(new JScrollPane(chatBox));
-		setSize(300, 180);
-		setVisible(true);
+		chatWindow.add(new JScrollPane(chatBox));
+		chatWindow.setSize(300, 180);
+		chatWindow.setVisible(true);
 	}
 
 	public void startRunning() {
@@ -50,7 +69,7 @@ public class Server extends JFrame {
 			@Override
 			public void run() {
 				try {
-					server = new ServerSocket(port, 100);
+					serverSocket = new ServerSocket(port, 100);
 					while (true) {
 						try {
 							waitForConnection();
@@ -63,7 +82,7 @@ public class Server extends JFrame {
 						}
 					}
 				} catch (IOException ioException) {
-					ioException.printStackTrace();
+					System.out.println("Stopping server: " + ioException.getMessage());
 				}
 
 			}
@@ -72,16 +91,16 @@ public class Server extends JFrame {
 
 	public void waitForConnection() throws IOException {
 		showMessage("Waiting for someone to connect!");
-		connection = server.accept();
-		showMessage("\nNow connected to" + connection.getInetAddress()
+		clientConnection = serverSocket.accept();
+		showMessage("\nNow connected to" + clientConnection.getInetAddress()
 				.getHostName() + " !");
 
 	}
 
 	public void setupStreams() throws IOException {
-		output = new ObjectOutputStream(connection.getOutputStream());
+		output = new ObjectOutputStream(clientConnection.getOutputStream());
 		output.flush();
-		input = new ObjectInputStream(connection.getInputStream());
+		input = new ObjectInputStream(clientConnection.getInputStream());
 		showMessage("\nStreams are setup! \n");
 	}
 
@@ -114,13 +133,30 @@ public class Server extends JFrame {
 		showMessage("\n Closing connections \n");
 		ableToType(false);
 		try {
-			output.close();
-			input.close();
-			connection.close();
+			if (output != null) {
+				output.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			if (clientConnection != null) {
+				clientConnection.close();
+			}
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
 
+	public void stopServer() {
+		System.out.println("Stopping server...");
+		while (serverSocket != null && !serverSocket.isClosed()) {
+			try {
+				serverSocket.close();
+				return;
+			} catch (IOException e) {
+				System.out.println("Failed to stop server...");
+			}
+		}
 	}
 
 	public void showMessage(final String text) {
@@ -139,5 +175,24 @@ public class Server extends JFrame {
 				userMessage.setEditable(tof);
 			}
 		});
+	}
+
+	public int getPort() {
+		return serverSocket.getLocalPort();
+	}
+
+	public boolean isRunning() {
+		if (serverSocket == null) {
+			return false;
+		}
+		return !serverSocket.isClosed();
+	}
+
+	public void setDefaultCloseOperation(int exitOnClose) {
+		chatWindow.setDefaultCloseOperation(exitOnClose);
+	}
+
+	public boolean isClientConnected() {
+		return clientConnection != null && !clientConnection.isClosed();
 	}
 }
