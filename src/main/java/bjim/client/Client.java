@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
 
 public class Client {
 
+	public static final String LOCAL_HOST = "127.0.0.1";
+
 	// client input/output channels
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
@@ -37,6 +39,9 @@ public class Client {
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+	public Client(){
+		this(LOCAL_HOST);
+	}
 	public boolean windowvisible=false;
 
 	public Client(String host) {
@@ -81,7 +86,7 @@ public class Client {
 					showMessage("\n Client terminated the connection");
 
 				} catch (IOException ioException) {
-					ioException.printStackTrace();
+					System.out.println("Stopping client: " + ioException.getMessage());
 				} finally {
 					closeCrap();
 				}
@@ -183,5 +188,9 @@ public class Client {
 
 	public void setDefaultCloseOperation(int exitOnClose) {
 		chatWindow.setDefaultCloseOperation(exitOnClose);
+	}
+
+	public String getServerIP() {
+		return serverIP;
 	}
 }

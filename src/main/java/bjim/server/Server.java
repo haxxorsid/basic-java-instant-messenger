@@ -115,7 +115,7 @@ public class Server  {
 						}
 					}
 				} catch (IOException ioException) {
-					ioException.printStackTrace();
+					System.out.println("Stopping server: " + ioException.getMessage());
 				}
 
 			}
@@ -220,7 +220,7 @@ public class Server  {
 
 	public void stopServer() {
 		System.out.println("Stopping server...");
-		while (!serverSocket.isClosed()) {
+		while (serverSocket != null && !serverSocket.isClosed()) {
 			try {
 				serverSocket.close();
 				return;
@@ -269,5 +269,9 @@ public class Server  {
 
 	public void setDefaultCloseOperation(int exitOnClose) {
 		chatWindow.setDefaultCloseOperation(exitOnClose);
+	}
+
+	public boolean isClientConnected() {
+		return clientConnection != null && !clientConnection.isClosed();
 	}
 }
