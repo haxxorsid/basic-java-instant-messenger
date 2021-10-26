@@ -86,4 +86,68 @@ public class ClientTest {
 		client.stopClient();
 		server.stopServer();
 	}
+	@Test
+	public void multipleClientGetsConnection() throws InterruptedException {
+		Server server=new Server();
+		Client client1=new Client();
+		Client client2=new Client();
+		server.startRunning();
+		client1.startRunning();
+		client2.startRunning();
+		assertTrue(client1.isconnected());
+		assertTrue(client2.isconnected());
+		server.stopServer();
+		client1.stopClient();
+		client2.stopClient();
+	}
+
+	@Test
+	public void MultipleClientsendmessagetoServer() throws InterruptedException {
+		Server server=new Server();
+		Client client1=new Client();
+		Client client2=new Client();
+		server.startRunning();
+		client1.startRunning();
+		client2.startRunning();
+		client1.sendMessage("hi");
+		assertEquals("client1:hi",server.getLastReceivedMessage());
+		client2.sendMessage("hello");
+		assertEquals("client2:hello",server.getLastReceivedMessage());
+
+		client1.stopClient();
+		client2.stopClient();
+	}
+	@Test
+	public void serversendmessagetobothclients() throws InterruptedException {
+		Server server=new Server();
+		Client client1=new Client();
+		Client client2=new Client();
+		server.startRunning();
+		client1.startRunning();
+		client2.startRunning();
+	server.sendMessage("hi");
+		assertEquals("server:hi",client1.getLastReceivedMessage());
+
+		assertEquals("server:hi",client2.getLastReceivedMessage());
+
+		client1.stopClient();
+		client2.stopClient();
+	}
+
+	@Test
+	public void ServerShowsMessageOnCLientDisconnection() throws InterruptedException
+	{
+		Server server=new Server();
+		Client client1=new Client();
+		Client client2=new Client();
+		server.startRunning();
+		client1.startRunning();
+		client2.startRunning();
+		client2.stopClient();
+		assertEquals("client2 is disconnected",server.getLastReceivedMessage());
+		server.stopServer();
+		client1.stopClient();
+		client2.stopClient();
+
+	}
 }

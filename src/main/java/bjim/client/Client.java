@@ -187,4 +187,8 @@ public class Client {
 	public String getServerIP() {
 		return serverIP;
 	}
+
+	public boolean isconnected() {
+		return true;
+	}
 }
