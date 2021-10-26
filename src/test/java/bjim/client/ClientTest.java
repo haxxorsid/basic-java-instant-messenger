@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static bjim.client.Client.LOCAL_HOST;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ClientTest {
 
@@ -43,11 +44,10 @@ public class ClientTest {
 		Assert.assertEquals(LOCAL_HOST, serverIP);
 	}
 
-	@Test //checkingVisibilityof ClientWindow
-	public void windowIsVisibleduringstartTheclient() throws InterruptedException
+	@Test
+	public void windowIsVisibleDuringStartTheClient() throws InterruptedException
 	{
 
-		// given
 		// given
 		Server server = new Server();
 		Client client = new Client("127.0.0.1");
@@ -56,20 +56,17 @@ public class ClientTest {
 		client.startRunning();
 		Thread.sleep(1000);
 
+		assertTrue(client.isWindowVisibleClientSide());
 
-
-
-		assertEquals(true, client.isWindowvisibleclientSide());
-
-
-		server.stopServer();
-
+		// after
 		client.stopClient();
+		server.stopServer();
 	}
 
 
 	@Test
 	public void clientSendsAMessageAndServerReceivesIt() throws InterruptedException {
+
 		// given
 		Server server = new Server();
 		Client client = new Client("127.0.0.1");
@@ -80,15 +77,13 @@ public class ClientTest {
 
 		//when
 		client.sendMessage("hi");
-		Thread.sleep(500);
 
 		// then
+		Thread.sleep(500);
 		assertEquals("USER - hi", server.getLastReceivedMessage());
+
 		//after
-		server.stopServer();
 		client.stopClient();
-
-
-
+		server.stopServer();
 	}
 }

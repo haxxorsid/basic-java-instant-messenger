@@ -1,6 +1,7 @@
 package bjim.client;
 
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.EOFException;
@@ -11,12 +12,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class Client {
 
@@ -39,10 +34,11 @@ public class Client {
 
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-	public Client(){
+	public boolean windowVisible;
+
+	public Client() {
 		this(LOCAL_HOST);
 	}
-	public boolean windowvisible=false;
 
 	public Client(String host) {
 		serverIP = host;
@@ -63,13 +59,11 @@ public class Client {
 		chatWindow.add(new JScrollPane(chatBox), BorderLayout.CENTER);
 		chatWindow.setSize(300, 180);
 		chatWindow.setVisible(true);
-		windowvisible=chatWindow.isVisible();
+		windowVisible = chatWindow.isVisible();
 	}
 
-	//check client window is Visible
-	public boolean isWindowvisibleclientSide()
-	{
-		return windowvisible;
+	public boolean isWindowVisibleClientSide() {
+		return windowVisible;
 	}
 
 	public void startRunning() {
