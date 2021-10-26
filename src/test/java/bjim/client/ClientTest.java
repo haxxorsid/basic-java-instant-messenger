@@ -109,9 +109,9 @@ public class ClientTest {
         client1.startRunning();
         client2.startRunning();
         client1.sendMessage("hi");
-        assertEquals("client1:hi", server.getLastReceivedMessage());
+        assertEquals("USER1 - hi", server.getLastReceivedMessage());
         client2.sendMessage("hello");
-        assertEquals("client2:hello", server.getLastReceivedMessage());
+        assertEquals("USER2 - hello", server.getLastReceivedMessage());
 
         client1.stopClient();
         client2.stopClient();
@@ -126,9 +126,9 @@ public class ClientTest {
         client1.startRunning();
         client2.startRunning();
         server.sendMessage("hi");
-        assertEquals("server:hi", client1.getLastReceivedMessage());
+        assertEquals("ADMIN- hi", client1.getLastReceivedMessage());
 
-        assertEquals("server:hi", client2.getLastReceivedMessage());
+        assertEquals("ADMIN- hi", client2.getLastReceivedMessage());
 
         client1.stopClient();
         client2.stopClient();
