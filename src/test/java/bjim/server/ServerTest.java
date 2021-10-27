@@ -1,7 +1,6 @@
 package bjim.server;
 
 import static bjim.server.Server.DEFAULT_PORT;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -153,7 +152,7 @@ public class ServerTest {
         Thread.sleep(1000);
 
         // then
-        assertEquals(true, server.isWindowvisible());
+        assertEquals(true, server.isWindowVisible());
 
         // after
         server.stopServer();

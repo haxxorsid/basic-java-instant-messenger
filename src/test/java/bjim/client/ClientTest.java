@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import bjim.server.Server;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ClientTest {
@@ -25,7 +24,7 @@ public class ClientTest {
         boolean clientConnected = server.isClientConnected();
 
         // then
-        Assert.assertTrue(clientConnected);
+        assertTrue(clientConnected);
 
         // after
         server.stopServer();
@@ -38,10 +37,11 @@ public class ClientTest {
         // given
         Client client = new Client();
 
-        // whe
+        // when
         String serverIP = client.getServerIP();
 
-        Assert.assertEquals(LOCAL_HOST, serverIP);
+        // then
+        assertEquals(LOCAL_HOST, serverIP);
     }
 
     @Test
@@ -55,6 +55,7 @@ public class ClientTest {
         client.startRunning();
         Thread.sleep(1000);
 
+        // when...then
         assertTrue(client.isWindowVisibleClientSide());
 
         // after
@@ -86,66 +87,93 @@ public class ClientTest {
     }
 
     @Test
-    public void multipleClientGetsConnection() throws InterruptedException {
+    public void multipleClientGetsConnection() {
+
+        // given
         Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
         server.startRunning();
+
+        // when
         client1.startRunning();
         client2.startRunning();
+
+        // then
         assertTrue(client1.isconnected());
         assertTrue(client2.isconnected());
+
+        // after
         server.stopServer();
         client1.stopClient();
         client2.stopClient();
     }
 
     @Test
-    public void MultipleClientsendmessagetoServer() throws InterruptedException {
+    public void MultipleClientSendMessagesToServer() {
+
+        // given
         Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
         server.startRunning();
         client1.startRunning();
         client2.startRunning();
+
+        // when...then
         client1.sendMessage("hi");
         assertEquals("USER1 - hi", server.getLastReceivedMessage());
         client2.sendMessage("hello");
         assertEquals("USER2 - hello", server.getLastReceivedMessage());
 
+        // after
         client1.stopClient();
         client2.stopClient();
     }
 
     @Test
-    public void serversendmessagetobothclients() throws InterruptedException {
+    public void serverSendsMessagesToBothClients() {
+
+        // given
         Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
         server.startRunning();
         client1.startRunning();
         client2.startRunning();
-        server.sendMessage("hi");
-        assertEquals("ADMIN- hi", client1.getLastReceivedMessage());
 
+        // when
+        server.sendMessage("hi");
+
+        // then
+        assertEquals("ADMIN- hi", client1.getLastReceivedMessage());
         assertEquals("ADMIN- hi", client2.getLastReceivedMessage());
 
+        // after
         client1.stopClient();
         client2.stopClient();
+        server.stopServer();
     }
 
     @Test
-    public void ServerShowsMessageOnCLientDisconnection() throws InterruptedException {
+    public void ServerShowsMessageOnClientDisconnection() {
+
+        // given
         Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
         server.startRunning();
         client1.startRunning();
         client2.startRunning();
+
+        // when...then
+        client1.stopClient();
+        assertEquals("client1 is disconnected", server.getLastReceivedMessage());
+
         client2.stopClient();
         assertEquals("client2 is disconnected", server.getLastReceivedMessage());
+
+        // after
         server.stopServer();
-        client1.stopClient();
-        client2.stopClient();
     }
 }
