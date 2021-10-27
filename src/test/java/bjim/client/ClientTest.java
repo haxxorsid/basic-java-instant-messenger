@@ -5,29 +5,37 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import bjim.server.Server;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ClientTest {
 
+    Server server = new Server();
+
+    @Before
+    public void setUp() {
+        server.startRunning();
+    }
+
+    @After
+    public void tearDown() {
+        server.stopRunning();
+    }
+
     @Test
-    public void isClientConnected() throws InterruptedException {
+    public void numberOfConnectedClientsIsOne() throws InterruptedException {
 
         // given
-        Server server = new Server();
         Client client = new Client();
-        server.startRunning();
         Thread.sleep(1000);
         client.startRunning();
         Thread.sleep(1000);
 
-        // when
-        boolean clientConnected = server.isClientConnected();
-
-        // then
-        assertTrue(clientConnected);
+        // when...then
+        assertEquals(1, server.numberOfClientsConnected());
 
         // after
-        server.stopServer();
         client.stopClient();
     }
 
@@ -48,9 +56,7 @@ public class ClientTest {
     public void windowIsVisibleDuringStartTheClient() throws InterruptedException {
 
         // given
-        Server server = new Server();
         Client client = new Client("127.0.0.1");
-        server.startRunning();
         Thread.sleep(1000);
         client.startRunning();
         Thread.sleep(1000);
@@ -60,16 +66,13 @@ public class ClientTest {
 
         // after
         client.stopClient();
-        server.stopServer();
     }
 
     @Test
     public void clientSendsAMessageAndServerReceivesIt() throws InterruptedException {
 
         // given
-        Server server = new Server();
         Client client = new Client("127.0.0.1");
-        server.startRunning();
         Thread.sleep(1000);
         client.startRunning();
         Thread.sleep(1000);
@@ -83,17 +86,14 @@ public class ClientTest {
 
         // after
         client.stopClient();
-        server.stopServer();
     }
 
     @Test
-    public void multipleClientGetsConnection() {
+    public void multipleClientsConnected() {
 
         // given
-        Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
-        server.startRunning();
 
         // when
         client1.startRunning();
@@ -104,19 +104,16 @@ public class ClientTest {
         assertTrue(client2.isconnected());
 
         // after
-        server.stopServer();
         client1.stopClient();
         client2.stopClient();
     }
 
     @Test
-    public void MultipleClientSendMessagesToServer() {
+    public void twoClientsSendMessagesToServer() {
 
         // given
-        Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
-        server.startRunning();
         client1.startRunning();
         client2.startRunning();
 
@@ -132,13 +129,11 @@ public class ClientTest {
     }
 
     @Test
-    public void serverSendsMessagesToBothClients() {
+    public void serverSendsMessagesToTwoClients() {
 
         // given
-        Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
-        server.startRunning();
         client1.startRunning();
         client2.startRunning();
 
@@ -152,17 +147,14 @@ public class ClientTest {
         // after
         client1.stopClient();
         client2.stopClient();
-        server.stopServer();
     }
 
     @Test
-    public void ServerShowsMessageOnClientDisconnection() {
+    public void serverShowsMessageOnClientDisconnection() {
 
         // given
-        Server server = new Server();
         Client client1 = new Client();
         Client client2 = new Client();
-        server.startRunning();
         client1.startRunning();
         client2.startRunning();
 
@@ -172,8 +164,5 @@ public class ClientTest {
 
         client2.stopClient();
         assertEquals("client2 is disconnected", server.getLastReceivedMessage());
-
-        // after
-        server.stopServer();
     }
 }

@@ -28,7 +28,7 @@ public class ServerTest {
         assertTrue(server.isRunning());
 
         // after
-        server.stopServer();
+        server.stopRunning();
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ServerTest {
         Thread.sleep(1000);
 
         // when
-        server.stopServer();
+        server.stopRunning();
 
         // then
         Thread.sleep(1000);
@@ -61,7 +61,7 @@ public class ServerTest {
         assertEquals(DEFAULT_PORT, server.getPort());
 
         // after
-        server.stopServer();
+        server.stopRunning();
     }
 
     @Test
@@ -85,27 +85,24 @@ public class ServerTest {
         assertEquals(CUSTOM_PORT, server.getPort());
 
         // after code
-        server.stopServer();
+        server.stopRunning();
     }
 
-    // Tests by Jaydeb
     @Test
-    public void checkConnectiontrueforServer() throws InterruptedException {
+    public void numberOfConnectedClientsIsZero() throws InterruptedException {
 
         // given
-
         Server server = new Server();
-        // Client cl = new Client("127.0.0.1");
 
         // when
         server.startRunning();
         Thread.sleep(1000);
 
         // then
-        assertFalse(server.connected());
+        assertEquals(0, server.numberOfClientsConnected());
 
         // after
-        server.stopServer();
+        server.stopRunning();
     }
 
     @Test
@@ -126,7 +123,7 @@ public class ServerTest {
         // then
         assertEquals("ADMIN- hi", client.getLastReceivedMessage());
         // after
-        server.stopServer();
+        server.stopRunning();
         client.stopClient();
     }
 
@@ -141,7 +138,7 @@ public class ServerTest {
         assertEquals(true, server.isServerMessageVisible());
 
         // after
-        server.stopServer();
+        server.stopRunning();
     }
 
     @Test
@@ -155,6 +152,6 @@ public class ServerTest {
         assertEquals(true, server.isWindowVisible());
 
         // after
-        server.stopServer();
+        server.stopRunning();
     }
 }
