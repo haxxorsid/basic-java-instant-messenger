@@ -27,12 +27,10 @@ public class Server {
 
     private ClientConnection clientConnection;
 
-    // checking variables
-    public String msg;
-    public boolean connected_sr_cl = false;
-
-    public boolean windowvisible = false;
-    public boolean userMessageVisible = false;
+    public String serverMessage = "";
+    public boolean connectedSrCl = false;
+    public boolean windowVisible;
+    public boolean userMessageVisible;
 
     // checking last received message from client to server
     private String lastReceivedMessagetoServer = "";
@@ -64,16 +62,15 @@ public class Server {
         chatWindow.setSize(300, 180);
         chatWindow.setVisible(true);
 
-        windowvisible = chatWindow.isVisible();
+        windowVisible = chatWindow.isVisible();
         userMessageVisible = userMessage.isVisible();
     }
 
     // check server window is Visible
-    public boolean isWindowvisible() {
-        return windowvisible;
+    public boolean isWindowVisible() {
+        return windowVisible;
     }
 
-    // check user messagefrom server  is Visible
     public boolean isServerMessageVisible() {
         return userMessageVisible;
     }
@@ -107,7 +104,7 @@ public class Server {
     public void waitForConnection() throws IOException {
         showMessage("Waiting for someone to connect!");
         clientConnection = new ClientConnection(serverSocket.accept());
-        connected_sr_cl = true;
+        connectedSrCl = true;
         showMessage(
                 "\nNow connected to"
                         + clientConnection.getSocket().getInetAddress().getHostName()
@@ -116,10 +113,8 @@ public class Server {
 
     // check server and client are connected
     public boolean connected() {
-        return connected_sr_cl;
+        return connectedSrCl;
     }
-
-    public String servermsg = "";
 
     public void whileChatting() throws IOException {
         String message = "\nYou are now connected!";
@@ -144,10 +139,6 @@ public class Server {
         return lastReceivedMessagetoServer;
     }
 
-    public String servermessagereturn() {
-        return servermsg;
-    }
-
     public void sendMessage(String message) {
 
         try {
@@ -160,13 +151,6 @@ public class Server {
         }
     }
 
-    public String getchatText() {
-        // return chatBox.getText();
-        // return msg;
-
-        return userMessage.getText();
-    }
-
     private void closeCrap() {
         showMessage("\n Closing connections \n");
         ableToType(false);
@@ -177,7 +161,7 @@ public class Server {
             if (clientConnection.getInput() != null) {
                 clientConnection.getInput().close();
             }
-            if (clientConnection != null) {
+            if (clientConnection.getSocket() != null) {
                 clientConnection.getSocket().close();
             }
         } catch (IOException ioException) {
@@ -205,10 +189,6 @@ public class Server {
                         chatBox.append(text);
                     }
                 });
-    }
-
-    public String messagefromserver() {
-        return chatBox.getText();
     }
 
     public void ableToType(final boolean tof) {

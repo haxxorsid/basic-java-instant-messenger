@@ -1,11 +1,10 @@
 package bjim.server;
 
-import lombok.Getter;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import lombok.Getter;
 
 @Getter
 public class ClientConnection {
