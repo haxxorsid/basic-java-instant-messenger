@@ -90,7 +90,7 @@ public class Client {
     private void connectToServer() throws IOException {
         showMessage("Attempting connection");
         clientSocket = new Socket(InetAddress.getByName(serverIP), 6789);
-        showMessage("\nConnected to" + clientSocket.getInetAddress().getHostName());
+        showMessage("\nConnected to: " + clientSocket.getInetAddress().getHostName());
     }
 
     private void setupStreams() throws IOException {
@@ -133,7 +133,7 @@ public class Client {
 
     public void stopRunning() {
         System.out.println("Stopping client...");
-        while (!clientSocket.isClosed()) {
+        while (clientSocket != null && !clientSocket.isClosed()) {
             try {
                 clientSocket.close();
                 return;
@@ -144,10 +144,16 @@ public class Client {
     }
 
     public void sendMessage(String message) {
+
+        if (output == null) {
+            return;
+        }
+
         try {
-            output.writeObject("USER - " + message);
+            String messageToSend = "USER - " + message;
+            output.writeObject(messageToSend);
             output.flush();
-            showMessage("\nUSER - " + message);
+            showMessage("\n" + messageToSend);
         } catch (IOException ioException) {
             chatBox.append("\nSomething is messed up!");
         }
@@ -182,6 +188,6 @@ public class Client {
     }
 
     public boolean isConnected() {
-        return clientSocket.isConnected();
+        return clientSocket != null && clientSocket.isConnected();
     }
 }

@@ -11,6 +11,7 @@ import org.junit.Test;
 
 public class ClientTest {
 
+    private static final int WAIT_SECS = 100;
     Server server = new Server();
 
     @Before
@@ -28,9 +29,9 @@ public class ClientTest {
 
         // given
         Client client = new Client();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
         client.startRunning();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
 
         // when...then
         assertEquals(1, server.numberOfClientsConnected());
@@ -57,9 +58,9 @@ public class ClientTest {
 
         // given
         Client client = new Client("127.0.0.1");
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
         client.startRunning();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
 
         // when...then
         assertTrue(client.isWindowVisibleClientSide());
@@ -73,15 +74,15 @@ public class ClientTest {
 
         // given
         Client client = new Client("127.0.0.1");
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
         client.startRunning();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
 
         // when
         client.sendMessage("hi");
 
         // then
-        Thread.sleep(500);
+        Thread.sleep(WAIT_SECS);
         assertEquals("USER - hi", server.getLastReceivedMessage());
 
         // after
@@ -89,7 +90,7 @@ public class ClientTest {
     }
 
     @Test
-    public void multipleClientsConnected() {
+    public void multipleClientsConnected() throws InterruptedException {
 
         // given
         Client client1 = new Client();
@@ -98,6 +99,7 @@ public class ClientTest {
         // when
         client1.startRunning();
         client2.startRunning();
+        Thread.sleep(WAIT_SECS);
 
         // then
         assertTrue(client1.isConnected());
@@ -109,19 +111,23 @@ public class ClientTest {
     }
 
     @Test
-    public void twoClientsSendMessagesToServer() {
+    public void twoClientsSendMessagesToServer() throws InterruptedException {
 
         // given
         Client client1 = new Client();
         Client client2 = new Client();
         client1.startRunning();
         client2.startRunning();
+        Thread.sleep(WAIT_SECS);
 
         // when...then
         client1.sendMessage("hi");
-        assertEquals("USER1 - hi", server.getLastReceivedMessage());
+        Thread.sleep(WAIT_SECS);
+        assertEquals("USER - hi", server.getLastReceivedMessage());
+
         client2.sendMessage("hello");
-        assertEquals("USER2 - hello", server.getLastReceivedMessage());
+        Thread.sleep(WAIT_SECS);
+        assertEquals("USER - hello", server.getLastReceivedMessage());
 
         // after
         client1.stopRunning();
@@ -129,18 +135,20 @@ public class ClientTest {
     }
 
     @Test
-    public void serverSendsMessagesToTwoClients() {
+    public void serverSendsMessagesToTwoClients() throws InterruptedException {
 
         // given
         Client client1 = new Client();
         Client client2 = new Client();
         client1.startRunning();
         client2.startRunning();
+        Thread.sleep(WAIT_SECS);
 
         // when
         server.sendMessage("hi");
 
         // then
+        Thread.sleep(WAIT_SECS);
         assertEquals("ADMIN- hi", client1.getLastReceivedMessage());
         assertEquals("ADMIN- hi", client2.getLastReceivedMessage());
 
@@ -150,19 +158,22 @@ public class ClientTest {
     }
 
     @Test
-    public void serverShowsMessageOnClientDisconnection() {
+    public void serverShowsMessageOnClientDisconnection() throws InterruptedException {
 
         // given
         Client client1 = new Client();
         Client client2 = new Client();
         client1.startRunning();
         client2.startRunning();
+        Thread.sleep(WAIT_SECS);
 
         // when...then
         client1.stopRunning();
+        Thread.sleep(WAIT_SECS);
         assertEquals("client1 is disconnected", server.getLastReceivedMessage());
 
         client2.stopRunning();
+        Thread.sleep(WAIT_SECS);
         assertEquals("client2 is disconnected", server.getLastReceivedMessage());
     }
 }

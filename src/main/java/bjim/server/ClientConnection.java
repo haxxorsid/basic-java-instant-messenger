@@ -19,4 +19,20 @@ public class ClientConnection {
         this.output.flush();
         this.input = new ObjectInputStream(socket.getInputStream());
     }
+
+    public String getHostName() {
+        return socket.getInetAddress().getHostName();
+    }
+
+    public void close() throws IOException {
+        if (getOutput() != null) {
+            getOutput().close();
+        }
+        if (getInput() != null) {
+            getInput().close();
+        }
+        if (getSocket() != null) {
+            getSocket().close();
+        }
+    }
 }

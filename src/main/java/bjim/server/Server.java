@@ -3,7 +3,6 @@ package bjim.server;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -33,7 +32,9 @@ public class Server {
     private String lastReceivedMessage = "";
 
     // A single thread for the server accept loop
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService serverThreadPool = Executors.newSingleThreadExecutor();
+
+    private ExecutorService handlerThreadPool = Executors.newFixedThreadPool(10);
 
     public Server() {
         this(DEFAULT_PORT);
@@ -70,61 +71,61 @@ public class Server {
 
     public void startRunning() {
 
-        executorService.submit(
+        serverThreadPool.submit(
                 new Runnable() {
 
                     @Override
                     public void run() {
                         try {
                             serverSocket = new ServerSocket(port, 100);
+                            showMessage("\nWaiting for someone to connect!");
+                            ableToType(true);
+
                             while (true) {
-                                try {
-                                    ClientConnection clientConnection = waitForConnection();
-                                    whileChatting(clientConnection);
-                                } catch (EOFException eofException) {
-                                    showMessage("\n Server ended the connection!");
-                                } finally {
-                                    disconnectClients();
-                                }
+                                waitForConnection();
                             }
+
                         } catch (IOException ioException) {
                             System.out.println("Stopping server: " + ioException.getMessage());
+                        } finally {
+                            disconnectClients();
                         }
                     }
                 });
     }
 
-    private ClientConnection waitForConnection() throws IOException {
-        showMessage("Waiting for someone to connect!");
+    private void waitForConnection() throws IOException {
+
         ClientConnection clientConnection = new ClientConnection(serverSocket.accept());
         clientConnections.add(clientConnection);
-        showMessage(
-                "\nNow connected to: "
-                        + clientConnection.getSocket().getInetAddress().getHostName()
-                        + " !");
-        return clientConnection;
+
+        handlerThreadPool.submit(() -> readMessages(clientConnection));
+
+        showMessage("\nNow connected to: " + clientConnection.getHostName() + " !");
     }
 
-    private void whileChatting(ClientConnection clientConnection) throws IOException {
-        String message = "\nYou are now connected!";
-        sendMessage(message);
-        ableToType(true);
-        do {
+    private void readMessages(ClientConnection clientConnection) {
+
+        while (clientConnection != null && clientConnection.getInput() != null) {
             try {
                 lastReceivedMessage = String.valueOf(clientConnection.getInput().readObject());
                 showMessage("\n" + lastReceivedMessage);
 
-            } catch (ClassNotFoundException classNotFoundException) {
-                showMessage("\n I don't know what user send!");
+            } catch (IOException e) {
+                showMessage("\nClient: " + clientConnection.getHostName() + " closed");
+                closeClientConnection(clientConnection);
+                break;
+            } catch (ClassNotFoundException e) {
+                showMessage("\nI don't know what user send!");
             }
-        } while (!lastReceivedMessage.equals("\nUSER-END"));
+        }
     }
 
     public String getLastReceivedMessage() {
         return lastReceivedMessage;
     }
 
-    public void sendMessage(String message) {
+    public synchronized void sendMessage(String message) {
         for (ClientConnection clientConnection : clientConnections) {
             try {
                 clientConnection.getOutput().writeObject("ADMIN- " + message);
@@ -138,25 +139,26 @@ public class Server {
     }
 
     private void disconnectClients() {
-        showMessage("\n Closing connections \n");
+        showMessage("\nClosing connections\n");
         ableToType(false);
 
         for (ClientConnection clientConnection : clientConnections) {
-            try {
-                if (clientConnection.getOutput() != null) {
-                    clientConnection.getOutput().close();
-                }
-                if (clientConnection.getInput() != null) {
-                    clientConnection.getInput().close();
-                }
-                if (clientConnection.getSocket() != null) {
-                    clientConnection.getSocket().close();
-                }
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            closeClientConnection(clientConnection);
         }
         clientConnections.clear();
+    }
+
+    private void closeClientConnection(ClientConnection clientConnection) {
+        if (clientConnection == null) {
+            return;
+        }
+        try {
+            clientConnection.close();
+            clientConnections.remove(clientConnection);
+        } catch (IOException e) {
+            System.out.println(
+                    "Error while attempting to close client connection: " + e.getMessage());
+        }
     }
 
     public void stopRunning() {
@@ -171,7 +173,7 @@ public class Server {
         }
     }
 
-    public void showMessage(final String text) {
+    public synchronized void showMessage(final String text) {
         SwingUtilities.invokeLater(
                 new Runnable() {
 
