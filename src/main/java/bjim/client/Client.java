@@ -137,7 +137,7 @@ public class Client {
         }
     }
 
-    public void stopClient() {
+    public void stopRunning() {
         System.out.println("Stopping client...");
         while (!clientSocket.isClosed()) {
             try {

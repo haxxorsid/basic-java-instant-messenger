@@ -36,7 +36,7 @@ public class ClientTest {
         assertEquals(1, server.numberOfClientsConnected());
 
         // after
-        client.stopClient();
+        client.stopRunning();
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ClientTest {
         assertTrue(client.isWindowVisibleClientSide());
 
         // after
-        client.stopClient();
+        client.stopRunning();
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ClientTest {
         assertEquals("USER - hi", server.getLastReceivedMessage());
 
         // after
-        client.stopClient();
+        client.stopRunning();
     }
 
     @Test
@@ -104,8 +104,8 @@ public class ClientTest {
         assertTrue(client2.isconnected());
 
         // after
-        client1.stopClient();
-        client2.stopClient();
+        client1.stopRunning();
+        client2.stopRunning();
     }
 
     @Test
@@ -124,8 +124,8 @@ public class ClientTest {
         assertEquals("USER2 - hello", server.getLastReceivedMessage());
 
         // after
-        client1.stopClient();
-        client2.stopClient();
+        client1.stopRunning();
+        client2.stopRunning();
     }
 
     @Test
@@ -145,8 +145,8 @@ public class ClientTest {
         assertEquals("ADMIN- hi", client2.getLastReceivedMessage());
 
         // after
-        client1.stopClient();
-        client2.stopClient();
+        client1.stopRunning();
+        client2.stopRunning();
     }
 
     @Test
@@ -159,10 +159,10 @@ public class ClientTest {
         client2.startRunning();
 
         // when...then
-        client1.stopClient();
+        client1.stopRunning();
         assertEquals("client1 is disconnected", server.getLastReceivedMessage());
 
-        client2.stopClient();
+        client2.stopRunning();
         assertEquals("client2 is disconnected", server.getLastReceivedMessage());
     }
 }

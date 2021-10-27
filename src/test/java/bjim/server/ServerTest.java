@@ -124,7 +124,7 @@ public class ServerTest {
         assertEquals("ADMIN- hi", client.getLastReceivedMessage());
         // after
         server.stopRunning();
-        client.stopClient();
+        client.stopRunning();
     }
 
     @Test
