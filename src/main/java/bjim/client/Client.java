@@ -17,14 +17,11 @@ public class Client {
 
     public static final String LOCAL_HOST = "127.0.0.1";
 
-    // client input/output channels
-    private ObjectOutputStream output;
-    private ObjectInputStream input;
-
     private String serverIP;
 
-    // the socket where the client is connected
     private Socket clientSocket;
+    private ObjectOutputStream output;
+    private ObjectInputStream input;
 
     // Chat attributes
     private JFrame chatWindow;
@@ -33,8 +30,6 @@ public class Client {
     private String lastReceivedMessage = "";
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    public boolean windowVisible;
 
     public Client() {
         this(LOCAL_HOST);
@@ -59,11 +54,10 @@ public class Client {
         chatWindow.add(new JScrollPane(chatBox), BorderLayout.CENTER);
         chatWindow.setSize(300, 180);
         chatWindow.setVisible(true);
-        windowVisible = chatWindow.isVisible();
     }
 
     public boolean isWindowVisibleClientSide() {
-        return windowVisible;
+        return chatWindow.isVisible();
     }
 
     public void startRunning() {
@@ -83,7 +77,7 @@ public class Client {
                         } catch (IOException ioException) {
                             System.out.println("Stopping client: " + ioException.getMessage());
                         } finally {
-                            closeCrap();
+                            disconnect();
                         }
                     }
                 });
@@ -119,7 +113,7 @@ public class Client {
         } while (!lastReceivedMessage.equals("\nADMIN - END"));
     }
 
-    private void closeCrap() {
+    private void disconnect() {
         showMessage("\nClosing down!");
         ableToType(false);
         try {
@@ -187,7 +181,7 @@ public class Client {
         return serverIP;
     }
 
-    public boolean isconnected() {
-        return true;
+    public boolean isConnected() {
+        return clientSocket.isConnected();
     }
 }

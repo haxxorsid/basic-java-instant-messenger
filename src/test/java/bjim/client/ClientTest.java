@@ -100,8 +100,8 @@ public class ClientTest {
         client2.startRunning();
 
         // then
-        assertTrue(client1.isconnected());
-        assertTrue(client2.isconnected());
+        assertTrue(client1.isConnected());
+        assertTrue(client2.isConnected());
 
         // after
         client1.stopRunning();
