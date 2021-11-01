@@ -1,7 +1,8 @@
 language: java
 
-jdk:
-  - oraclejdk15
+jdk: oraclejdk15
+
+os: linux
 
 script:
   - export DISPLAY=:0
