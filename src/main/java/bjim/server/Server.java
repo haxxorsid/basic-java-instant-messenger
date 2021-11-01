@@ -1,16 +1,15 @@
 package bjim.server;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.swing.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class Server {
 
     public static final int DEFAULT_PORT = 6789;
@@ -21,55 +20,41 @@ public class Server {
     // the socket where the server is listening
     private ServerSocket serverSocket;
 
-    // Chat attributes
-    private JFrame chatWindow;
-    private JTextField userMessage;
-    private JTextArea chatBox;
+    private final ServerChatWindow serverChatWindow;
 
     private final List<ClientConnection> clientConnections = new ArrayList<>();
 
     // checking last received message from client to server
-    private String lastReceivedMessage = "";
+    @Getter private String lastReceivedMessage = "";
 
     // A single thread for the server accept loop
-    private ExecutorService serverThreadPool = Executors.newSingleThreadExecutor();
+    private final ExecutorService serverThreadPool = Executors.newSingleThreadExecutor();
 
-    private ExecutorService handlerThreadPool = Executors.newFixedThreadPool(10);
+    private final ExecutorService handlerThreadPool = Executors.newFixedThreadPool(10);
 
     public Server() {
         this(DEFAULT_PORT);
     }
 
     public Server(int port) {
-        this.port = port;
+        this(port, new ServerChatWindow());
+    }
 
-        chatWindow = new JFrame("Instant Messenger");
-        userMessage = new JTextField();
-        userMessage.setEditable(false);
-        userMessage.addActionListener(
-                new ActionListener() {
-
-                    public void actionPerformed(ActionEvent event) {
-                        sendMessage(event.getActionCommand());
-                        userMessage.setText("");
-                    }
-                });
-        chatWindow.add(userMessage, BorderLayout.NORTH);
-        chatBox = new JTextArea();
-        chatWindow.add(new JScrollPane(chatBox));
-        chatWindow.setSize(300, 180);
-        chatWindow.setVisible(true);
+    public Server(ServerChatWindow serverChatWindow) {
+        this(DEFAULT_PORT, serverChatWindow);
     }
 
     public boolean isWindowVisible() {
-        return chatWindow.isVisible();
+        return serverChatWindow.isVisible();
     }
 
     public boolean isServerMessageVisible() {
-        return userMessage.isVisible();
+        return serverChatWindow.isUserMessageVisible();
     }
 
     public void startRunning() {
+
+        serverChatWindow.onSend(event -> sendMessage(event.getActionCommand()));
 
         serverThreadPool.submit(
                 new Runnable() {
@@ -121,10 +106,6 @@ public class Server {
         }
     }
 
-    public String getLastReceivedMessage() {
-        return lastReceivedMessage;
-    }
-
     public synchronized void sendMessage(String message) {
         for (ClientConnection clientConnection : clientConnections) {
             try {
@@ -133,7 +114,7 @@ public class Server {
                 showMessage("\nADMIN- " + message);
 
             } catch (IOException ioException) {
-                chatBox.append("\nERROR: Can't send that message");
+                serverChatWindow.append("\nERROR: Can't send that message");
             }
         }
     }
@@ -173,24 +154,12 @@ public class Server {
         }
     }
 
-    public synchronized void showMessage(final String text) {
-        SwingUtilities.invokeLater(
-                new Runnable() {
-
-                    public void run() {
-                        chatBox.append(text);
-                    }
-                });
+    public synchronized void showMessage(String text) {
+        serverChatWindow.showMessage(text);
     }
 
-    public void ableToType(final boolean tof) {
-        SwingUtilities.invokeLater(
-                new Runnable() {
-
-                    public void run() {
-                        userMessage.setEditable(tof);
-                    }
-                });
+    public void ableToType(boolean tof) {
+        serverChatWindow.ableToType(tof);
     }
 
     public int getPort() {
@@ -205,7 +174,7 @@ public class Server {
     }
 
     public void setDefaultCloseOperation(int exitOnClose) {
-        chatWindow.setDefaultCloseOperation(exitOnClose);
+        serverChatWindow.setDefaultCloseOperation(exitOnClose);
     }
 
     public int numberOfClientsConnected() {

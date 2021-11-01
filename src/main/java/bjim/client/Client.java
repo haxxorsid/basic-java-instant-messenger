@@ -1,8 +1,5 @@
 package bjim.client;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,53 +8,41 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.swing.*;
 
 public class Client {
 
     public static final String LOCAL_HOST = "127.0.0.1";
 
-    private String serverIP;
-
+    private final ClientChatWindow clientChatWindow;
+    private String host;
     private Socket clientSocket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
-    // Chat attributes
-    private JFrame chatWindow;
-    private JTextField userMessage;
-    private JTextArea chatBox;
     private String lastReceivedMessage = "";
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public Client() {
-        this(LOCAL_HOST);
+        this(new ClientChatWindow());
     }
 
     public Client(String host) {
-        serverIP = host;
-        userMessage = new JTextField();
-        userMessage.setEditable(false);
-        userMessage.addActionListener(
-                new ActionListener() {
+        this(host, new ClientChatWindow());
+    }
 
-                    public void actionPerformed(ActionEvent event) {
-                        sendMessage(event.getActionCommand());
-                        userMessage.setText("");
-                    }
-                });
+    public Client(ClientChatWindow clientChatWindow) {
+        this(LOCAL_HOST, clientChatWindow);
+    }
 
-        chatWindow = new JFrame("Client!");
-        chatWindow.add(userMessage, BorderLayout.NORTH);
-        chatBox = new JTextArea();
-        chatWindow.add(new JScrollPane(chatBox), BorderLayout.CENTER);
-        chatWindow.setSize(300, 180);
-        chatWindow.setVisible(true);
+    public Client(String host, ClientChatWindow clientChatWindow) {
+        this.host = host;
+        this.clientChatWindow = clientChatWindow;
+        this.clientChatWindow.onSend(event -> sendMessage(event.getActionCommand()));
     }
 
     public boolean isWindowVisibleClientSide() {
-        return chatWindow.isVisible();
+        return clientChatWindow.isVisible();
     }
 
     public void startRunning() {
@@ -89,7 +74,7 @@ public class Client {
 
     private void connectToServer() throws IOException {
         showMessage("Attempting connection");
-        clientSocket = new Socket(InetAddress.getByName(serverIP), 6789);
+        clientSocket = new Socket(InetAddress.getByName(host), 6789);
         showMessage("\nConnected to: " + clientSocket.getInetAddress().getHostName());
     }
 
@@ -155,36 +140,24 @@ public class Client {
             output.flush();
             showMessage("\n" + messageToSend);
         } catch (IOException ioException) {
-            chatBox.append("\nSomething is messed up!");
+            clientChatWindow.append("\nSomething is messed up!");
         }
     }
 
     private void showMessage(final String m) {
-        SwingUtilities.invokeLater(
-                new Runnable() {
-
-                    public void run() {
-                        chatBox.append(m);
-                    }
-                });
+        clientChatWindow.showMessage(m);
     }
 
     private void ableToType(final boolean tof) {
-        SwingUtilities.invokeLater(
-                new Runnable() {
-
-                    public void run() {
-                        userMessage.setEditable(tof);
-                    }
-                });
+        clientChatWindow.ableToType(tof);
     }
 
     public void setDefaultCloseOperation(int exitOnClose) {
-        chatWindow.setDefaultCloseOperation(exitOnClose);
+        clientChatWindow.setDefaultCloseOperation(exitOnClose);
     }
 
     public String getServerIP() {
-        return serverIP;
+        return host;
     }
 
     public boolean isConnected() {
