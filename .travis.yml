@@ -7,4 +7,4 @@ os: linux
 script:
   - export DISPLAY=:0
   - java --version
-  - mvn clean test
+  - mvn clean test -Djava.awt.headless=false
