@@ -5,6 +5,7 @@ jdk: openjdk15
 os: linux
 
 script:
+  - sudo apt-get install openjdk-15-jre
   - export DISPLAY=:0
   - java --version
   - mvn clean test -Djava.awt.headless=false
