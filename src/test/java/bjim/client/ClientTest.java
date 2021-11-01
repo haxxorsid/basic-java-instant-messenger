@@ -156,24 +156,4 @@ public class ClientTest {
         client1.stopRunning();
         client2.stopRunning();
     }
-
-    @Test
-    public void serverShowsMessageOnClientDisconnection() throws InterruptedException {
-
-        // given
-        Client client1 = new Client();
-        Client client2 = new Client();
-        client1.startRunning();
-        client2.startRunning();
-        Thread.sleep(WAIT_SECS);
-
-        // when...then
-        client1.stopRunning();
-        Thread.sleep(WAIT_SECS);
-        assertEquals("client1 is disconnected", server.getLastReceivedMessage());
-
-        client2.stopRunning();
-        Thread.sleep(WAIT_SECS);
-        assertEquals("client2 is disconnected", server.getLastReceivedMessage());
-    }
 }
