@@ -7,68 +7,59 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import bjim.client.Client;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ServerTest {
 
+    private static final int WAIT_SECS = 100;
+
     private static final int CUSTOM_PORT = 1234;
 
-    // Test by Saleh
+    Server server = new Server();
+
+    @Before
+    public void setUp() throws InterruptedException {
+        server.startRunning();
+        Thread.sleep(WAIT_SECS);
+    }
+
+    @After
+    public void tearDown() {
+        server.stopRunning();
+    }
+
     @Test
     public void startServer() throws InterruptedException {
 
-        // given
-        Server server = new Server();
-
-        // when
-        server.startRunning();
-
-        // then
-        Thread.sleep(1000);
+        // when..then
         assertTrue(server.isRunning());
-
-        // after
-        server.stopRunning();
     }
 
     @Test
     public void stopServer() throws InterruptedException {
 
-        // given
-        Server server = new Server();
-        server.startRunning();
-        Thread.sleep(1000);
-
         // when
         server.stopRunning();
 
         // then
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
         assertFalse(server.isRunning());
     }
 
     @Test
-    public void serverStartsOnDefaultPort() throws InterruptedException {
+    public void serverStartsOnDefaultPort() {
 
-        // given
-        Server server = new Server();
-
-        // when
-        server.startRunning();
-
-        // then
-        Thread.sleep(1000);
+        // when..then
         assertEquals(DEFAULT_PORT, server.getPort());
-
-        // after
-        server.stopRunning();
     }
 
     @Test
     public void serverStartsOnCustomPort() throws InterruptedException {
 
         // given
-        Server server = new Server(CUSTOM_PORT);
+        Server customServer = new Server(CUSTOM_PORT);
 
         // before
         assertNotEquals(
@@ -78,25 +69,18 @@ public class ServerTest {
                 CUSTOM_PORT);
 
         // when
-        server.startRunning();
+        customServer.startRunning();
 
         // then
-        Thread.sleep(1000);
-        assertEquals(CUSTOM_PORT, server.getPort());
+        Thread.sleep(WAIT_SECS);
+        assertEquals(CUSTOM_PORT, customServer.getPort());
 
         // after code
-        server.stopRunning();
+        customServer.stopRunning();
     }
 
     @Test
-    public void numberOfConnectedClientsIsZero() throws InterruptedException {
-
-        // given
-        Server server = new Server();
-
-        // when
-        server.startRunning();
-        Thread.sleep(1000);
+    public void numberOfConnectedClientsIsZero() {
 
         // then
         assertEquals(0, server.numberOfClientsConnected());
@@ -109,12 +93,9 @@ public class ServerTest {
     public void serverSendsAMessageAndClientReceivesIt() throws InterruptedException {
 
         // given
-        Server server = new Server();
         Client client = new Client("127.0.0.1");
-        server.startRunning();
-        Thread.sleep(1000);
         client.startRunning();
-        Thread.sleep(1000);
+        Thread.sleep(WAIT_SECS);
 
         // when
         server.sendMessage("hi");
@@ -122,17 +103,14 @@ public class ServerTest {
 
         // then
         assertEquals("ADMIN- hi", client.getLastReceivedMessage());
+
         // after
         server.stopRunning();
         client.stopRunning();
     }
 
     @Test
-    public void serverUserMessageVisibleTrue() throws InterruptedException {
-        // given
-        Server server = new Server();
-        server.startRunning();
-        Thread.sleep(1000);
+    public void serverUserMessageVisibleTrue() {
 
         // then
         assertEquals(true, server.isServerMessageVisible());
@@ -142,11 +120,7 @@ public class ServerTest {
     }
 
     @Test
-    public void windowIsVisibleduringWhenstartTheServer() throws InterruptedException {
-        // given
-        Server server = new Server();
-        server.startRunning();
-        Thread.sleep(1000);
+    public void windowIsVisibleDuringWhenStartTheServer() {
 
         // then
         assertEquals(true, server.isWindowVisible());
