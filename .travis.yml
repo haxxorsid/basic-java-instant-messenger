@@ -1,6 +1,6 @@
 language: java
 
-jdk: oraclejdk15
+jdk: openjdk15
 
 os: linux
 
