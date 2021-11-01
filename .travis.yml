@@ -4,6 +4,6 @@ jdk:
   - oraclejdk15
 
 script:
-  - export DISPLAY=:0.0
+  - export DISPLAY=:0
   - java --version
   - mvn clean test
