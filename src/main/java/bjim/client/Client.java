@@ -23,12 +23,19 @@ public class Client {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+    public static Client withUsername(String username) {
+        return new Client(LOCAL_HOST, username);
+    }
     public Client() {
         this(new ClientChatWindow());
     }
 
     public Client(String serverIP) {
         this(serverIP, new ClientChatWindow());
+    }
+
+    public Client(String serverIP, String username) {
+        this(serverIP, new ClientChatWindow(username));
     }
 
     public Client(ClientChatWindow chatWindow) {

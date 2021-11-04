@@ -5,8 +5,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import bjim.client.Client;
+import bjim.client.ClientChatWindow;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +20,13 @@ public class ServerTest {
 
     private static final int CUSTOM_PORT = 1234;
 
-    Server server = new Server();
+    final ServerChatWindow serverChatWindow = mock(ServerChatWindow.class);
+
+    Server server = new Server(serverChatWindow);
 
     @Before
     public void setUp() throws InterruptedException {
-        server = new Server();
+        server = new Server(serverChatWindow);
         server.startRunning();
         Thread.sleep(WAIT_SECS);
     }
@@ -60,7 +65,7 @@ public class ServerTest {
     public void serverStartsOnCustomPort() throws InterruptedException {
 
         // given
-        Server customServer = new Server(CUSTOM_PORT);
+        Server customServer = new Server(CUSTOM_PORT, serverChatWindow);
 
         // before
         assertNotEquals(
@@ -94,7 +99,9 @@ public class ServerTest {
     public void serverSendsAMessageAndClientReceivesIt() throws InterruptedException {
 
         // given
-        Client client = new Client("127.0.0.1");
+        when(serverChatWindow.getUsername()).thenReturn("Server");
+        ClientChatWindow clientChatWindow = mock(ClientChatWindow.class);
+        Client client = new Client("127.0.0.1", clientChatWindow);
         client.startRunning();
         Thread.sleep(WAIT_SECS);
 
@@ -113,6 +120,9 @@ public class ServerTest {
     @Test
     public void serverUserMessageVisibleTrue() {
 
+        // given
+        when(serverChatWindow.isUserMessageVisible()).thenReturn(true);
+
         // then
         assertEquals(true, server.isServerMessageVisible());
 
@@ -122,6 +132,9 @@ public class ServerTest {
 
     @Test
     public void windowIsVisibleDuringWhenStartTheServer() {
+
+        // given
+        when(serverChatWindow.isVisible()).thenReturn(true);
 
         // then
         assertEquals(true, server.isWindowVisible());
