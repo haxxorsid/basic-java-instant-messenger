@@ -1,4 +1,4 @@
-package bjim.server;
+package bjim.common;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -7,13 +7,13 @@ import java.net.Socket;
 import lombok.Getter;
 
 @Getter
-public class ClientConnection {
+public class Connection {
 
     private final Socket socket;
     private final ObjectOutputStream output;
     private final ObjectInputStream input;
 
-    public ClientConnection(Socket socket) throws IOException {
+    public Connection(Socket socket) throws IOException {
         this.socket = socket;
         this.output = new ObjectOutputStream(socket.getOutputStream());
         this.output.flush();
@@ -34,5 +34,13 @@ public class ClientConnection {
         if (getSocket() != null) {
             getSocket().close();
         }
+    }
+
+    public boolean isClosed() {
+        return socket == null || socket.isClosed();
+    }
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected();
     }
 }

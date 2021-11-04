@@ -21,6 +21,7 @@ public class ServerTest {
 
     @Before
     public void setUp() throws InterruptedException {
+        server = new Server();
         server.startRunning();
         Thread.sleep(WAIT_SECS);
     }
@@ -31,9 +32,9 @@ public class ServerTest {
     }
 
     @Test
-    public void startServer() throws InterruptedException {
+    public void startServer() {
 
-        // when..then
+        // then
         assertTrue(server.isRunning());
     }
 
@@ -102,7 +103,7 @@ public class ServerTest {
         Thread.sleep(500);
 
         // then
-        assertEquals("ADMIN- hi", client.getLastReceivedMessage());
+        assertEquals("Server:\n  hi", client.getLastReceivedMessage());
 
         // after
         server.stopRunning();

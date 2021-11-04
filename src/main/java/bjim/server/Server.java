@@ -1,5 +1,6 @@
 package bjim.server;
 
+import bjim.common.Connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ public class Server {
     // the socket where the server is listening
     private ServerSocket serverSocket;
 
-    private final ServerChatWindow serverChatWindow;
+    private final ServerChatWindow chatWindow;
 
-    private final List<ClientConnection> clientConnections = new ArrayList<>();
+    private final List<Connection> connections = new ArrayList<>();
 
     // checking last received message from client to server
     @Getter private String lastReceivedMessage = "";
@@ -40,106 +41,42 @@ public class Server {
         this(port, new ServerChatWindow());
     }
 
-    public Server(ServerChatWindow serverChatWindow) {
-        this(DEFAULT_PORT, serverChatWindow);
+    public Server(ServerChatWindow chatWindow) {
+        this(DEFAULT_PORT, chatWindow);
     }
 
     public boolean isWindowVisible() {
-        return serverChatWindow.isVisible();
+        return chatWindow.isVisible();
     }
 
     public boolean isServerMessageVisible() {
-        return serverChatWindow.isUserMessageVisible();
+        return chatWindow.isUserMessageVisible();
     }
 
     public void startRunning() {
 
-        serverChatWindow.onSend(event -> sendMessage(event.getActionCommand()));
+        chatWindow.onSend(event -> sendMessage(event.getActionCommand()));
 
-        serverThreadPool.submit(
-                new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            serverSocket = new ServerSocket(port, 100);
-                            showMessage("\nWaiting for someone to connect!");
-                            ableToType(true);
-
-                            while (true) {
-                                waitForConnection();
-                            }
-
-                        } catch (IOException ioException) {
-                            System.out.println("Stopping server: " + ioException.getMessage());
-                        } finally {
-                            disconnectClients();
-                        }
-                    }
-                });
-    }
-
-    private void waitForConnection() throws IOException {
-
-        ClientConnection clientConnection = new ClientConnection(serverSocket.accept());
-        clientConnections.add(clientConnection);
-
-        handlerThreadPool.submit(() -> readMessages(clientConnection));
-
-        showMessage("\nNow connected to: " + clientConnection.getHostName() + " !");
-    }
-
-    private void readMessages(ClientConnection clientConnection) {
-
-        while (clientConnection != null && clientConnection.getInput() != null) {
-            try {
-                lastReceivedMessage = String.valueOf(clientConnection.getInput().readObject());
-                showMessage("\n" + lastReceivedMessage);
-
-            } catch (IOException e) {
-                showMessage("\nClient: " + clientConnection.getHostName() + " closed");
-                closeClientConnection(clientConnection);
-                break;
-            } catch (ClassNotFoundException e) {
-                showMessage("\nI don't know what user send!");
-            }
-        }
+        serverThreadPool.submit(new StartServer());
     }
 
     public synchronized void sendMessage(String message) {
-        for (ClientConnection clientConnection : clientConnections) {
-            try {
-                clientConnection.getOutput().writeObject("ADMIN- " + message);
-                clientConnection.getOutput().flush();
-                showMessage("\nADMIN- " + message);
 
+        String messageToSend = chatWindow.getUsername() + ":\n  " + message;
+
+        for (Connection connection : connections) {
+            try {
+                sendMessage(messageToSend, connection);
+                showMessage("\n" + messageToSend);
             } catch (IOException ioException) {
-                serverChatWindow.append("\nERROR: Can't send that message");
+                chatWindow.append("\nERROR: Can't send that message");
             }
         }
     }
 
-    private void disconnectClients() {
-        showMessage("\nClosing connections\n");
-        ableToType(false);
-
-        for (ClientConnection clientConnection : clientConnections) {
-            closeClientConnection(clientConnection);
-        }
-        clientConnections.clear();
-    }
-
-    private void closeClientConnection(ClientConnection clientConnection) {
-        if (clientConnection == null) {
-            return;
-        }
-        try {
-            clientConnection.close();
-            clientConnections.remove(clientConnection);
-        } catch (IOException e) {
-            System.out.println(
-                    "Error while attempting to close client connection: " + e.getMessage());
-        }
+    private void sendMessage(String messageToSend, Connection connection) throws IOException {
+        connection.getOutput().writeObject(messageToSend);
+        connection.getOutput().flush();
     }
 
     public void stopRunning() {
@@ -155,11 +92,11 @@ public class Server {
     }
 
     public synchronized void showMessage(String text) {
-        serverChatWindow.showMessage(text);
+        chatWindow.showMessage(text);
     }
 
     public void ableToType(boolean tof) {
-        serverChatWindow.ableToType(tof);
+        chatWindow.ableToType(tof);
     }
 
     public int getPort() {
@@ -174,16 +111,91 @@ public class Server {
     }
 
     public void setDefaultCloseOperation(int exitOnClose) {
-        serverChatWindow.setDefaultCloseOperation(exitOnClose);
+        chatWindow.setDefaultCloseOperation(exitOnClose);
     }
 
     public int numberOfClientsConnected() {
         int count = 0;
-        for (ClientConnection clientConnection : clientConnections) {
-            if (clientConnection != null && !clientConnection.getSocket().isClosed()) {
+        for (Connection connection : connections) {
+            if (connection != null && !connection.getSocket().isClosed()) {
                 ++count;
             }
         }
         return count;
+    }
+
+    private class StartServer implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                serverSocket = new ServerSocket(port, 100);
+                setStatus("Waiting for clients to connect!");
+                ableToType(true);
+
+                while (true) {
+                    waitForConnection();
+                }
+
+            } catch (IOException ioException) {
+                System.out.println("Stopping server: " + ioException.getMessage());
+            } finally {
+                disconnectClients();
+            }
+        }
+
+        private void waitForConnection() throws IOException {
+
+            Connection connection = new Connection(serverSocket.accept());
+            connections.add(connection);
+
+            handlerThreadPool.submit(() -> readMessages(connection));
+
+            setStatus("(" + connections.size() + ") client(s) are connected");
+        }
+
+        private void disconnectClients() {
+            showMessage("\nClosing connections\n");
+            ableToType(false);
+
+            for (Connection connection : connections) {
+                closeClientConnection(connection);
+            }
+            connections.clear();
+        }
+
+        private void readMessages(Connection connection) {
+
+            while (connection != null && connection.getInput() != null) {
+                try {
+                    lastReceivedMessage = String.valueOf(connection.getInput().readObject());
+                    showMessage("\n" + lastReceivedMessage);
+
+                } catch (IOException e) {
+                    closeClientConnection(connection);
+                    setStatus("(" + connections.size() + ") client(s) are connected");
+                    break;
+                } catch (ClassNotFoundException e) {
+                    setStatus("(" + connections.size() + ") client(s) are connected");
+                }
+            }
+        }
+
+        private void setStatus(String text) {
+            chatWindow.setStatus(text);
+        }
+
+        private void closeClientConnection(Connection connection) {
+            if (connection == null) {
+                return;
+            }
+            try {
+                connection.close();
+                connections.remove(connection);
+            } catch (IOException e) {
+                System.out.println(
+                        "Error while attempting to close client connection: " + e.getMessage());
+            }
+        }
     }
 }

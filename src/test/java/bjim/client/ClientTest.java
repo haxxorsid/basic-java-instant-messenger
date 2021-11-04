@@ -83,7 +83,7 @@ public class ClientTest {
 
         // then
         Thread.sleep(WAIT_SECS);
-        assertEquals("USER - hi", server.getLastReceivedMessage());
+        assertEquals("Client:\n  hi", server.getLastReceivedMessage());
 
         // after
         client.stopRunning();
@@ -123,11 +123,11 @@ public class ClientTest {
         // when...then
         client1.sendMessage("hi");
         Thread.sleep(WAIT_SECS);
-        assertEquals("USER - hi", server.getLastReceivedMessage());
+        assertEquals("Client:\n  hi", server.getLastReceivedMessage());
 
         client2.sendMessage("hello");
         Thread.sleep(WAIT_SECS);
-        assertEquals("USER - hello", server.getLastReceivedMessage());
+        assertEquals("Client:\n  hello", server.getLastReceivedMessage());
 
         // after
         client1.stopRunning();
@@ -149,8 +149,8 @@ public class ClientTest {
 
         // then
         Thread.sleep(WAIT_SECS);
-        assertEquals("ADMIN- hi", client1.getLastReceivedMessage());
-        assertEquals("ADMIN- hi", client2.getLastReceivedMessage());
+        assertEquals("Server:\n  hi", client1.getLastReceivedMessage());
+        assertEquals("Server:\n  hi", client2.getLastReceivedMessage());
 
         // after
         client1.stopRunning();
