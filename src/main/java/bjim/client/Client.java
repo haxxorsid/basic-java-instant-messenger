@@ -26,6 +26,7 @@ public class Client {
     public static Client withUsername(String username) {
         return new Client(LOCAL_HOST, username);
     }
+
     public Client() {
         this(new ClientChatWindow());
     }

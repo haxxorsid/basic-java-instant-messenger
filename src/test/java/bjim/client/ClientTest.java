@@ -3,8 +3,11 @@ package bjim.client;
 import static bjim.client.Client.LOCAL_HOST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import bjim.server.Server;
+import bjim.server.ServerChatWindow;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +15,21 @@ import org.junit.Test;
 public class ClientTest {
 
     private static final int WAIT_SECS = 100;
-    Server server = new Server();
+
+    final ServerChatWindow serverChatWindow = mock(ServerChatWindow.class);
+    final ClientChatWindow clientChatWindow = mock(ClientChatWindow.class);
+
+    private Server server;
+    private Client client;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        server = new Server(serverChatWindow);
         server.startRunning();
+        Thread.sleep(WAIT_SECS);
+        client = new Client(clientChatWindow);
+        when(clientChatWindow.getUsername()).thenReturn("Client");
+        when(serverChatWindow.getUsername()).thenReturn("Server");
     }
 
     @After
@@ -28,8 +41,6 @@ public class ClientTest {
     public void numberOfConnectedClientsIsOne() throws InterruptedException {
 
         // given
-        Client client = new Client();
-        Thread.sleep(WAIT_SECS);
         client.startRunning();
         Thread.sleep(WAIT_SECS);
 
@@ -43,9 +54,6 @@ public class ClientTest {
     @Test
     public void serverIPIsLocalHostByDefault() {
 
-        // given
-        Client client = new Client();
-
         // when
         String serverIP = client.getServerIP();
 
@@ -57,8 +65,7 @@ public class ClientTest {
     public void windowIsVisibleDuringStartTheClient() throws InterruptedException {
 
         // given
-        Client client = new Client("127.0.0.1");
-        Thread.sleep(WAIT_SECS);
+        when(clientChatWindow.isVisible()).thenReturn(true);
         client.startRunning();
         Thread.sleep(WAIT_SECS);
 
@@ -73,8 +80,6 @@ public class ClientTest {
     public void clientSendsAMessageAndServerReceivesIt() throws InterruptedException {
 
         // given
-        Client client = new Client("127.0.0.1");
-        Thread.sleep(WAIT_SECS);
         client.startRunning();
         Thread.sleep(WAIT_SECS);
 
@@ -93,8 +98,8 @@ public class ClientTest {
     public void multipleClientsConnected() throws InterruptedException {
 
         // given
-        Client client1 = new Client();
-        Client client2 = new Client();
+        Client client1 = new Client(clientChatWindow);
+        Client client2 = new Client(clientChatWindow);
 
         // when
         client1.startRunning();
@@ -114,8 +119,8 @@ public class ClientTest {
     public void twoClientsSendMessagesToServer() throws InterruptedException {
 
         // given
-        Client client1 = new Client();
-        Client client2 = new Client();
+        Client client1 = new Client(clientChatWindow);
+        Client client2 = new Client(clientChatWindow);
         client1.startRunning();
         client2.startRunning();
         Thread.sleep(WAIT_SECS);
@@ -138,8 +143,8 @@ public class ClientTest {
     public void serverSendsMessagesToTwoClients() throws InterruptedException {
 
         // given
-        Client client1 = new Client();
-        Client client2 = new Client();
+        Client client1 = new Client(clientChatWindow);
+        Client client2 = new Client(clientChatWindow);
         client1.startRunning();
         client2.startRunning();
         Thread.sleep(WAIT_SECS);
