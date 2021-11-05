@@ -5,9 +5,5 @@ jdk: openjdk15
 os: linux
 
 script:
-  - sudo apt-get install openjdk-15-jre
-  - sudo apt-get install libxtst6
-  - sudo apt-get install libxtst6:i386
-  - export DISPLAY=:1
   - java --version
   - mvn clean test
