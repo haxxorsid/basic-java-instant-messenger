@@ -7,6 +7,7 @@ import static javax.swing.SwingUtilities.invokeLater;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import lombok.Getter;
 
 public class AbstractChatWindow {
@@ -19,7 +20,7 @@ public class AbstractChatWindow {
     protected final JFrame chatWindow;
     protected final JTextField userInput;
     protected final JTextArea chatText;
-    protected final JTextArea status;
+    protected final JLabel status;
 
     @Getter private final String username;
 
@@ -28,13 +29,18 @@ public class AbstractChatWindow {
         this.username = username;
 
         chatWindow = new JFrame(username);
+        chatWindow.setLayout(new BorderLayout());
 
         userInput = new JTextField();
         chatWindow.add(userInput, NORTH);
 
-        status = new JTextArea();
-        status.setEditable(false);
-        chatWindow.add(status, userInput.getX());
+        JPanel statusPanel = new JPanel();
+        statusPanel.setPreferredSize(new Dimension(WINDOW_WIDTH, 25));
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        status = new JLabel("");
+        statusPanel.add(status);
+
+        chatWindow.add(statusPanel, BorderLayout.SOUTH);
 
         chatText = createChatText();
         JScrollPane comp = new JScrollPane(chatText);
@@ -76,6 +82,7 @@ public class AbstractChatWindow {
 
     public void showMessage(final String text) {
         invokeLater(() -> chatText.append(text));
+        invokeLater(() -> chatText.append("\n___________________________________"));
     }
 
     public void ableToType(final boolean tof) {
