@@ -1,16 +1,14 @@
 package bjim;
 
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 import bjim.client.Client;
-import javax.swing.*;
 
 public class ClientApplication {
 
     public static void main(String[] args) {
-
-        // run client
-        Client user;
-        user = new Client("127.0.0.1");
-        user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        user.startRunning();
+        Client client = new Client();
+        client.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        client.startRunning();
     }
 }

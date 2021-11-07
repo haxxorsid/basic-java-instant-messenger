@@ -1,15 +1,14 @@
 package bjim;
 
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 import bjim.server.Server;
-import javax.swing.*;
 
 public class ServerApplication {
 
     public static void main(String[] args) {
-
-        // run server code
-        Server admin = new Server();
-        admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        admin.startRunning();
+        Server server = new Server();
+        server.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        server.startRunning();
     }
 }
