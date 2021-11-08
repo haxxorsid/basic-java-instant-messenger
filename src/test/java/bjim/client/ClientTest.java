@@ -6,15 +6,18 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import bjim.common.Connection;
 import bjim.server.Server;
 import bjim.server.ServerChatWindow;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class ClientTest {
 
-    private static final int WAIT_SECS = 100;
+    private static final int WAIT_SECS = 500;
 
     final ServerChatWindow serverChatWindow = mock(ServerChatWindow.class);
     final ClientChatWindow clientChatWindow = mock(ClientChatWindow.class);
@@ -87,7 +90,6 @@ public class ClientTest {
         client.sendMessage("hi");
 
         // then
-        Thread.sleep(WAIT_SECS);
         assertEquals("Client:\n  hi", server.getLastReceivedMessage());
 
         // after
@@ -161,4 +163,28 @@ public class ClientTest {
         client1.stopRunning();
         client2.stopRunning();
     }
+
+    // requires name to log in as a client
+    @Test
+    public void userRequiretoProvideNameDuringConnection() throws InterruptedException, IOException {
+        // given
+        Client client = new Client(clientChatWindow);
+        //Connection c=new Connection();
+        //client.provideUserName("")
+
+
+        // when
+        client.startRunning();
+        Thread.sleep(WAIT_SECS);
+
+        // then
+        //assertTrue(client.isClosed());
+        assertTrue(client.isConnected());
+
+        //assertTrue(conne);
+
+        // after
+        client.stopRunning();
+    }
+
 }
