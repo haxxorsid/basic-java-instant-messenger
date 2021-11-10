@@ -187,6 +187,6 @@ public class ClientTest {
         // after
         client.stopRunning();
         */
-    }
+   // }
 
 }
