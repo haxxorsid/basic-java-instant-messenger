@@ -111,6 +111,8 @@ public class Client {
         @Override
         public void run() {
             try {
+
+
                 connectToServer();
                 whileChatting();
             } catch (IOException eofException) {
