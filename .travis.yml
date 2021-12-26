@@ -1,0 +1,9 @@
+language: java
+
+jdk: openjdk15
+
+os: linux
+
+script:
+  - java --version
+  - mvn clean test
